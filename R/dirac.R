@@ -23,7 +23,7 @@
 #' @examples
 #' dirac.rank_vector(c(4,2,1,3))
 #' dirac.rank_vector(c(4,2,1,3),4)
-
+#' @export
 dirac.rank_vector <- function(expression,
                               expression.length=NULL,
                               matrix.index=NULL){
@@ -57,7 +57,7 @@ dirac.rank_vector <- function(expression,
 #' @examples
 #' dirac.rank_matrix(matrix(1:16, ncol=4, nrow=4))
 #'
-
+#' @export
 dirac.rank_matrix <- function(expression){
   # Calculate the expression.length (number of genes)
   expression.length <- nrow(expression)
@@ -86,6 +86,7 @@ dirac.rank_matrix <- function(expression){
 #' @examples
 #' dirac.rank_template(matrix(1:16,ncol=4, nrow=4))
 #'
+#' @export
 dirac.rank_template <- function(expression){
   # From the expression data, create the rank matrix
   rank_matrix <- dirac.rank_matrix(expression = expression)
@@ -108,7 +109,7 @@ dirac.rank_template <- function(expression){
 #'
 #' @examples
 #'  dirac.rank_matching_score(c(1,0,0,1,0), c(0,1,0,1,0))
-#'
+#' @export
 dirac.rank_matching_score <- function(rank_vector, rank_template){
   if(length(rank_vector)!=length(rank_template)){
     stop("rank_vector and rank_template must be same length")
@@ -132,7 +133,7 @@ dirac.rank_matching_score <- function(rank_vector, rank_template){
 #' rank_matrix <-dirac.rank_matrix(expression)
 #' rank_template <- dirac.rank_template(expression)
 #' dirac.rank_matching_score.vector(rank_matrix, rank_template)
-#'
+#' @export
 dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
   apply(rank_matrix,2, dirac.rank_matching_score,
         rank_template=rank_template)
@@ -154,6 +155,7 @@ dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
 #' rank_matrix <-dirac.rank_matrix(expression)
 #' rank_template <- dirac.rank_template(expression)
 #' dirac.rank_conservation_index(rank_matrix, rank_template)
+#' @export
 dirac.rank_conservation_index <- function(rank_matrix, rank_template){
   mean(dirac.rank_matching_score.vector(rank_matrix = rank_matrix,
                                    rank_template = rank_template))
