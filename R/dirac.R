@@ -1,14 +1,14 @@
-#' dirac.rank_vector: Determine DIRAC ranking vector
+#' Determine DIRAC ranking vector
 #'
-#' Creates a DIRAC ranking vector from expression data.
+#' `dirac.rank_vector` creates a DIRAC ranking vector from expression data.
 #'
 #' @param expression A numeric vector of gene expression data
-#' @param expression.legnth Optional, length of expression matrix, useful for
-#' repeated calls to this function with same expression length
-#' @param matrix.index Optional, a Boolean vector or matrix with TRUE for entries
-#' of gene-by-gene square matrix to be included in the rank_vector. Mainly used
-#' for repeated calls to this function so it doesn't have to be recalculated
-#' each time
+#' @param expression.length Optional, length of expression matrix, useful for
+#'    repeated calls to this function with same expression length
+#' @param matrix.index Optional, a Boolean vector or matrix with TRUE for
+#'    entries of gene-by-gene square matrix to be included in the rank_vector.
+#'    Mainly used for repeated calls to this function so it doesn't have to be
+#'    recalculated each time.
 #'
 #' @return Numeric rank vector
 #'
@@ -37,12 +37,12 @@ dirac.rank_vector <- function(expression,
   ((expression.matrix - t(expression.matrix))<0)[matrix.index]
 }
 
-#' dirac.rank_matrix: Determine DIRAC ranking matrix
+#' Determine DIRAC ranking matrix
 #'
-#' Creates a DIRAC ranking matrix from expression data.
+#' `dirac.rank_matrix` creates a DIRAC ranking matrix from expression data.
 #'
 #' @param expression A gene expression matrix, rows are genes, columns are
-#' samples
+#'    samples
 #'
 #' @return matrix whose columns represent the rank_vector for each sample
 #'
@@ -64,12 +64,14 @@ dirac.rank_matrix <- function(expression){
 
 
 
-#' dirac.rank_template: Generate rank template
+#' Generate rank template
 #'
-#' Create a DIRAC ranking template from expression data.
+#' `dirac.rank_template` creates a DIRAC ranking template from expression data.
+#'
+#' Strict inequality is used for finding the rank template.
 #'
 #' @param expression A gene expression matrix, rows are genes, columns are
-#' samples
+#'    samples
 #'
 #' @return Numeric vector, rank template
 #'
@@ -77,9 +79,56 @@ dirac.rank_matrix <- function(expression){
 #' dirac.rank_template(matrix(1:16,ncol=4, nrow=4))
 #'
 dirac.rank_template <- function(expression){
-
+  # From the expression data, create the rank matrix
+  rank_matrix <- dirac.rank_matrix(expression = expression)
+  # Take the row means to get the conditional probability
+  means <- rowMeans(rank_matrix)
+  # Determine which rows have probability below 0.5
+  means>0.5
 }
 
+#' Find rank matching score
+#'
+#' `dirac.rank_matching_score` finds the rank matching score between a rank
+#'    vector, and a rank template.
+#'
+#' @param rank_vector Boolean vector representing the rank vector, must be
+#'    the same length as rank_template.
+#' @param rank_template Boolean vector representing the rank template.
+#'
+#' @returns Float, representing the rank matching score
+#'
+#' @examples
+#'  dirac.rank_matching_score(c(1,0,0,1,0), c(0,1,0,1,0))
+#'
+dirac.rank_matching_score <- function(rank_vector, rank_template){
+  if(length(rank_vector)!=length(rank_template)){
+    stop("rank_vector and rank_template must be same length")
+  }
+  mean((rank_vector == rank_template))
+}
+
+#' Find rank matching score across samples
+#'
+#' `dirac.rank_matching_score.vector` finds the rank matching score between each
+#'    sample in a rank_matrix, and a rank_template
+#'
+#' @param rank_matrix Boolean matrix, columns represent each samples rank
+#'      vector
+#' @param rank_template Boolean vector, represents template to match against
+#'
+#' @returns Numeric vector of rank matching scores
+#'
+#' @examples
+#' expression <-  matrix(1:16, ncol=4, nrow=4)
+#' rank_matrix <-dirac.rank_matrix(expression)
+#' rank_template <- dirac.rank_template(expression)
+#' dirac.rank_matching_score.vector(rank_matrix, rank_template)
+#'
+dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
+  apply(rank_matrix,2, dirac.rank_matching_score,
+        rank_template=rank_template)
+}
 
 
 
