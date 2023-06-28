@@ -1,6 +1,6 @@
 #' dirac.rank_vector: Determine DIRAC ranking vector
 #'
-#' Creates a DIRAC ranking vector from expression data
+#' Creates a DIRAC ranking vector from expression data.
 #'
 #' @param expression A numeric vector of gene expression data
 #' @param expression.legnth Optional, length of expression matrix, useful for
@@ -13,8 +13,8 @@
 #' @return Numeric rank vector
 #'
 #' @examples
-#' # example code
-#'  dirac.rank_vector(c(4,2,1,3), 4)
+#' dirac.rank_vector(c(4,2,1,3))
+#' dirac.rank_vector(c(4,2,1,3),4)
 
 dirac.rank_vector <- function(expression,
                               expression.length=NULL,
@@ -39,12 +39,16 @@ dirac.rank_vector <- function(expression,
 
 #' dirac.rank_matrix: Determine DIRAC ranking matrix
 #'
-#' Creates a DIRAC ranking matrix from expression data
+#' Creates a DIRAC ranking matrix from expression data.
 #'
 #' @param expression A gene expression matrix, rows are genes, columns are
 #' samples
 #'
 #' @return matrix whose columns represent the rank_vector for each sample
+#'
+#' @examples
+#' dirac.rank_matrix(matrix(1:16, ncol=4, nrow=4))
+#'
 
 dirac.rank_matrix <- function(expression){
   # Calculate the expression.length (number of genes)
@@ -57,3 +61,25 @@ dirac.rank_matrix <- function(expression){
         expression.length=expression.length,
         matrix.index=matrix.index)
 }
+
+
+
+#' dirac.rank_template: Generate rank template
+#'
+#' Create a DIRAC ranking template from expression data.
+#'
+#' @param expression A gene expression matrix, rows are genes, columns are
+#' samples
+#'
+#' @return Numeric vector, rank template
+#'
+#' @examples
+#' dirac.rank_template(matrix(1:16,ncol=4, nrow=4))
+#'
+dirac.rank_template <- function(expression){
+
+}
+
+
+
+
