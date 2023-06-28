@@ -1,3 +1,11 @@
+# Based on: Eddy, James A., et al. “Identifying Tightly Regulated and Variably
+# Expressed Networks by Differential Rank Conservation (DIRAC).” PLoS
+# Computational Biology, vol. 6, no. 5, May 2010.
+# go-gale-com.offcampus.lib.washington.edu,
+# https://doi.org/10.1371/journal.pcbi.1000792.
+
+
+
 #' Determine DIRAC ranking vector
 #'
 #' `dirac.rank_vector` creates a DIRAC ranking vector from expression data.
@@ -130,5 +138,7 @@ dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
         rank_template=rank_template)
 }
 
-
+#' Find rank convervation index
+#'
+#' `dirac.`
 
