@@ -11,6 +11,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
-    SummarizedExperiment (>= 1.30.2)    
+    SummarizedExperiment (>= 1.28.0)    
 Config/testthat/edition: 3
 Remotes: bioc::3.16/SummarizedExperiment

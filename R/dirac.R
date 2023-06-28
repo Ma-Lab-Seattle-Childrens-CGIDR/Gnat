@@ -138,7 +138,23 @@ dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
         rank_template=rank_template)
 }
 
-#' Find rank convervation index
+#' Find rank conservation index
 #'
-#' `dirac.`
-
+#' `dirac.rank_conservation_index` finds the rank rank conservation index in
+#'    gene expression data
+#'
+#' @param rank_matrix Boolean matrix, columns represent each samples rank
+#'      vector
+#' @param rank_template Boolean vector, represents template to match against
+#'
+#' @returns Float representing the rank conservation index
+#'
+#' @examples
+#' expression <-  matrix(1:16, ncol=4, nrow=4)
+#' rank_matrix <-dirac.rank_matrix(expression)
+#' rank_template <- dirac.rank_template(expression)
+#' dirac.rank_conservation_index(rank_matrix, rank_template)
+dirac.rank_conservation_index <- function(rank_matrix, rank_template){
+  mean(dirac.rank_matching_score.vector(rank_matrix = rank_matrix,
+                                   rank_template = rank_template))
+}
