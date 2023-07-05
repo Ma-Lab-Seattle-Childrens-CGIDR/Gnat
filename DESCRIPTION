@@ -4,13 +4,17 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Braden", "Griebel", , "bgriebel@uw.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: Functions for evaluating the rank entropy of gene networks based 
+             on gene expression data. Included methods based on DIRAC, and also 
+             the Kendall Rank Correlation Coefficient. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
+    forach (>= 1.5.2),
+    doParallel (>= 1.0.17)
     SummarizedExperiment (>= 1.28.0)    
 Config/testthat/edition: 3
 Remotes: bioc::3.16/SummarizedExperiment

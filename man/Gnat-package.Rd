@@ -6,7 +6,7 @@
 \alias{Gnat-package}
 \title{Gnat: Analyze rank entropy in gene expression networks}
 \description{
-What the package does (one paragraph).
+Functions for evaluating the rank entropy of gene networks based on gene expression data. Included methods based on DIRAC, and also the Kendall Rank Correlation Coefficient.
 }
 \author{
 \strong{Maintainer}: Braden Griebel \email{bgriebel@uw.edu} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})

@@ -4,11 +4,10 @@
 \alias{dirac.rank_template}
 \title{Generate rank template}
 \usage{
-dirac.rank_template(expression)
+dirac.rank_template(rank_matrix)
 }
 \arguments{
-\item{expression}{A gene expression matrix, rows are genes, columns are
-samples}
+\item{rank_matrix}{Rank matrix, from dirac.rank_matrix}
 }
 \value{
 Numeric vector, rank template
