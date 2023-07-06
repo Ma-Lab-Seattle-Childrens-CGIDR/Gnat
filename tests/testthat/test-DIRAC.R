@@ -1,7 +1,7 @@
 # Main Function Tests -----------------------------------------------------
 testthat::test_that("Compare Network Classification Works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create list of gene_index vectors
   gene_index_list <- list(A=c(1,4,5), B=c(2,3,6), C=c(7,8,9,10))
@@ -35,17 +35,26 @@ testthat::test_that("Compare Network Classification Works",{
 })
 
 testthat::test_that("Compare phenotypes works",{
+  # Get the OS, since the parallel operation is different for the different
+  # os, and so with seeding works differently
+  os_type = .Platform$OS.type
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create list of gene_index vectors
   gene_index_list <- list(A=c(1,4,5), B=c(2,3,6), C=c(7,8,9,10))
   # Test parallel operation
-  phenotype_comp.expected <- data.frame(
-    gene_network=c("A","B","C"),
-    value=c(0,0,0),
-    pval=c(0.85,0.65,0.9)
-  )
+  if(os_type=="windows"){
+    phenotype_comp.expected <- data.frame(
+      gene_network=c("A","B","C"),
+      value=c(0,0,0),
+      pval=c(0.85,0.65,0.9)
+    )} else if(os_type=="unix"){
+      phenotype_comp.expected <- data.frame(
+        gene_network=c("A","B","C"),
+        value=c(0,0,0),
+        pval=c(0.95,0.70,0.9))
+    }
   rownames(phenotype_comp.expected) <- c("A","B","C")
   phenotype_comp.actual <-
     DIRAC.compare_phenotypes(expression, c(1,2,3,4), c(5,6,7,8),
@@ -63,14 +72,14 @@ testthat::test_that("Compare phenotypes works",{
   phenotype_comp.serial.actual <-
     DIRAC.compare_phenotypes(expression, c(1,2,3,4), c(5,6,7,8),
                              gene_index_list, bootstrap_iterations = 20,
-                             parallel=FALSE, cores=2, replace=TRUE, seed = 42,
+                             parallel=FALSE, cores=1, replace=TRUE, seed = 42,
                              as.frame=TRUE)
   expect_equal(phenotype_comp.serial.actual, phenotype_comp.serial.expected)
 })
 
 testthat::test_that("Creating a classifier works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create gene_index vector
   gene_index <- c(1,4,5,7)
@@ -172,7 +181,7 @@ testthat::test_that("Rank matching score for a matrix works",{
 })
 
 testthat::test_that("Rank difference score works",{
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   rank_difference_score.expected <- list(
     c(0.5, -0.1666666667, -0.16666667, 0.5),
@@ -187,7 +196,7 @@ testthat::test_that("Rank difference score works",{
 
 testthat::test_that("Classification rate works", {
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create list for gene_index
   gene_index <- c(1,4,5,7,10)
@@ -203,7 +212,7 @@ testthat::test_that("Classification rate works", {
 
 testthat::test_that("Classification rate comparison works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create list of gene_index vectors
   gene_index_list <- list(A=c(1,4,5), B=c(2,3,6), C=c(7,8,9,10))
@@ -226,7 +235,7 @@ testthat::test_that("Classification rate comparison works",{
 
 testthat::test_that("Classification rate best works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create list of gene_index vectors
   gene_index_list <- list(A=c(1,4,5), B=c(2,3,6), C=c(7,8,9,10))
@@ -239,7 +248,7 @@ testthat::test_that("Classification rate best works",{
 
 testthat::test_that("Single compare phenotype works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create the rank matrix
   rank_matrix <- dirac.rank_matrix(expression)
@@ -252,7 +261,7 @@ testthat::test_that("Single compare phenotype works",{
 
 testthat::test_that("Shuffled compare phenotype works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   # Create the rank matrix
   rank_matrix <- dirac.rank_matrix(expression)
@@ -265,7 +274,7 @@ testthat::test_that("Shuffled compare phenotype works",{
 
 testthat::test_that("Compare phenotype works",{
   # Create test expression set
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
   compare_phenotype_serial.expected <- list(value=0, pval=0.8)
   compare_phenotype_serial.actual <- dirac.compare_phenotype(

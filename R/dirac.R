@@ -750,7 +750,7 @@ dirac.compare_phenotype <- function(gene_index, expression, phenotype1,
   } else if(parallel){
     stop("Unsupported OS for parallel operation")
   } else {
-    set.seed(seed)
+    set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
     res <- unlist(lapply(1:bootstrap_iterations,dirac.compare_phenotype.shuffle,
                          rank_matrix=rank_matrix, combined=combined,
                          p1.size=p1.size, p2.size=p1.size, replace=replace))
