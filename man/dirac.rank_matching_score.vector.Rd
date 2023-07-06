@@ -22,6 +22,6 @@ sample in a rank_matrix, and a rank_template
 \examples{
 expression <-  matrix(1:16, ncol=4, nrow=4)
 rank_matrix <-dirac.rank_matrix(expression)
-rank_template <- dirac.rank_template(expression)
+rank_template <- dirac.rank_template(rank_matrix)
 dirac.rank_matching_score.vector(rank_matrix, rank_template)
 }

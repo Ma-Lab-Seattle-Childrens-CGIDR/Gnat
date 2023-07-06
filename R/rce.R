@@ -47,25 +47,27 @@
 #' phenotype2 <- sample(50, 15,replace=FALSE)
 #' # Run the RCE
 #' results <- rce(expression, gene_index_list, phenotype1, phenotype2,
-#'   iterations=100, parallel=TRUE, cores=2, replace=TRUE, seed1=42, seed2=314,
-#'   as.frame=TRUE)
-#' # View the results
-#' print(results)
-#' # Repeat using serial computation
-#' results <- rce(expression, gene_index_list, phenotype1, phenotype2,
 #'   iterations=100, parallel=FALSE, replace=TRUE, seed1=42, seed2=314,
 #'   as.frame=TRUE)
-#' # Show results, note likely not the same due to small number of iterations
-#' # and the different ways that random number generation is handled between
-#' # serial and parallel operation
+#' # Show results
+#' print(results)
+#' # Repeat using parallel operation
+#' results <- rce(expression, gene_index_list, phenotype1, phenotype2,
+#'   iterations=100, parallel=FALSE, cores=2, replace=TRUE, seed1=42, seed2=314,
+#'   as.frame=TRUE)
+#' # View the results, note likely not the same due to small number of
+#' # iterationsand the different ways that random number generation is handled
+#' # between serial and parallel operation
 #' print(results)
 rce <- function(gene_expression, gene_index_list, phenotype1, phenotype2,
                 iterations=1000, parallel=TRUE, cores=4, replace=TRUE, seed1,
                 seed2, as.frame=TRUE){
   pvals <- unlist(lapply(gene_index_list, rce.compare_phenotypes,
+                         gene_expression=gene_expression,
                          phenotype1=phenotype1, phenotype2=phenotype2,
-                         iterations=iterations, replace=replace, seed1=seed1,
-                         seed2=seed2))
+                         parallel=parallel, cores=cores,
+                         bootstrap_iterations=iterations, replace=replace,
+                         seed1=seed1, seed2=seed2))
   if(!as.frame){
     names(pvals) <- names(gene_index_list)
     return(pvals)
@@ -87,6 +89,7 @@ rce <- function(gene_expression, gene_index_list, phenotype1, phenotype2,
 #' @param x,y Numeric vectors between which the correlation coefficient is to be
 #'    calculated.
 #' @returns Float, the Kendall Rank Correlation Coefficient between `x` and `y`
+#' @export
 rce.rank_correlation.vector <- function(x,y){
   stats::cor.test(x,y, method="kendall")$estimate[[1]]
 }
@@ -101,6 +104,7 @@ rce.rank_correlation.vector <- function(x,y){
 #' @param template Numeric vector,
 #' @returns Float, mean of the Kendall Tau Rank correlation coefficients
 #'    between the template and all columns of gene_expression
+#' @export
 rce.rank_correlation.matrix <- function(gene_expression, template){
   apply(gene_expression, 2, rce.rank_correlation.vector,
         y=template)
@@ -119,6 +123,7 @@ rce.rank_correlation.matrix <- function(gene_expression, template){
 #'
 #' @returns Float, the mean of the Kendall Rank correlation coefficient
 #'    between the sampled template and the other samples in the phenotype
+#' @export
 rce.sample <- function(template_index, gene_expression){
   mean(rce.rank_correlation.matrix(gene_expression[,-template_index],
                               gene_expression[,template_index]))
@@ -127,8 +132,8 @@ rce.sample <- function(template_index, gene_expression){
 
 #' Compute empirical distribution for the Kendall Correlation Coefficient
 #'
-#' `rce.distribution` calculates the empirical distribution of the Kendall
-#' Correlation Coefficient.
+#' `rce.distribution.central` calculates the empirical distribution of the
+#' Kendall Correlation Coefficient.
 #'
 #' For each iteration a template sample is chosen, and the Kendall rank
 #' correlation coefficient is calculated between that template and all other
@@ -139,7 +144,7 @@ rce.sample <- function(template_index, gene_expression){
 #' @param gene_index Integer vector, representing the indices in the gene
 #'    network
 #' @param phenotype Integer vector, representing the indices of the phenotype
-#' @param iterations
+#' @param iterations Integer, number of iterations to use for bootstrapping
 #' @param parallel Boolean, whether parallel operation is desired
 #' @param cores Integer, number of  cores to use for parallel operation,
 #'    if greater than the number of available cores will be reduced to the
@@ -150,6 +155,7 @@ rce.sample <- function(template_index, gene_expression){
 #'
 #' @return Float vector, represents the empirical rank correlation entropy
 #'    distribution with the phenotype.
+#' @export
 rce.distribution.central <- function(gene_expression, gene_index, phenotype,
                              iterations=1000, parallel=TRUE, cores=4,
                              replace=TRUE, seed){
@@ -178,12 +184,13 @@ rce.distribution.central <- function(gene_expression, gene_index, phenotype,
   } else if(os_type=="windows"){
     # Make cluster
     cl <- parallel::makeCluster(cores)
-    # Export needed functions
-    parallel::clusterExport(cl, list("rce.rank_correlation.vector",
-                                     "rce.rank_correlation.matrix",
-                                     "rce.sample"))
     # perform calculation
-    res <- tryCatch(expr={unlist(
+    res <- tryCatch(expr={
+      # Export needed functions
+      parallel::clusterExport(cl, list("rce.rank_correlation.vector",
+                                       "rce.rank_correlation.matrix",
+                                       "rce.sample"))
+      unlist(
       parallel::parLapply(cl, templates, rce.sample,
                           gene_expression=gene_expression.filtered))},
       finally = {parallel::stopCluster(cl)})
@@ -202,7 +209,7 @@ rce.distribution.central <- function(gene_expression, gene_index, phenotype,
 #'    a gene network.
 #' @param phenotype1,phenotype2 Integer vectors, representing the indices
 #'    of the two phenotypes
-#' @param boostrap_iterations Integer, number of iterations to perform for
+#' @param bootstrap_iterations Integer, number of iterations to perform for
 #'    bootstrapping to create the distribution.
 #' @param parallel Boolean, whether to use parallel computing. On unix systems
 #'    will use a fork cluster, on windows will use a psock cluster.
@@ -220,19 +227,23 @@ rce.distribution.central <- function(gene_expression, gene_index, phenotype,
 #' @export
 #'
 #' @examples
-rce.compare_phenotypes <- function(gene_expression, gene_index, phenotype1,
+#' # example code
+#'
+rce.compare_phenotypes <- function(gene_index, gene_expression, phenotype1,
                                    phenotype2, bootstrap_iterations=1000,
                                    parallel=TRUE,
                                    cores=4, replace=TRUE, seed1, seed2){
-    p1.dist <- rce.distribution.central(gene_expression=gene_expression,
-                                gene_index=gene_index, phenotype = phenotype1,
-                                iterations = bootstrap_iterations,
-                                replace=replace,
-                                seed=seed1)
-    p2.dist <- rce.distribution.central(gene_expression=gene_expression,
-                                gene_index=gene_index, phenotype = phenotype2,
-                                iterations=bootstrap_iterations,
-                                replace=replace,
-                                seed=seed2)
-    stats::ks.test(p1.dist, p2.dist)$p.value
+  p1.dist <- rce.distribution.central(gene_expression=gene_expression,
+                              gene_index=gene_index, phenotype = phenotype1,
+                              iterations = bootstrap_iterations,
+                              parallel=parallel, cores=cores,
+                              replace=replace,
+                              seed=seed1)
+  p2.dist <- rce.distribution.central(gene_expression=gene_expression,
+                              gene_index=gene_index, phenotype = phenotype2,
+                              iterations=bootstrap_iterations,
+                              parallel=parallel, cores=cores,
+                              replace=replace,
+                              seed=seed2)
+  stats::ks.test(p1.dist, p2.dist)$p.value
 }

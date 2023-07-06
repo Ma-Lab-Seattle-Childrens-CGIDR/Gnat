@@ -25,6 +25,8 @@
 #' @param cores Integer, indicates number of cores to use for parallel
 #'    calculations. If greater than parallel::detectCores() return value,
 #'    will instead be set to said return value.
+#' @param as.frame Boolean, whether the return value should be a dataframe or
+#'    a named list.
 #'
 #' @returns
 #'    if as.frame is TRUE:
@@ -63,7 +65,7 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #'    two phenotypes
 #' @param gene_index A list of numeric vectors, each representing the indices
 #'    of a gene network.
-#' @param bootstrap Number of bootstrap iterations to run for computing
+#' @param bootstrap_iterations Number of bootstrap iterations to run for computing
 #'    the null distribution for calculating the p-value
 #' @param parallel Boolean determining if calculation should be run in parallel,
 #'    on unix systems it uses the mclapply function, and on windows it creates
@@ -79,6 +81,8 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #'    and the remainder of combined is taken as the other sample.
 #' @param seed Integer, used to set the seed for the random number generator
 #'    used for sampling.
+#' @param as.frame Boolean, whether return value should be dataframe or named
+#'    list, see return for more information.
 #' @returns
 #'    If as.frame is TRUE:
 #'      a dataframe with columns for gene network name
@@ -353,11 +357,11 @@ dirac.rank_matching_score <- function(rank_vector, rank_template){
 #' @examples
 #' expression <-  matrix(1:16, ncol=4, nrow=4)
 #' rank_matrix <-dirac.rank_matrix(expression)
-#' rank_template <- dirac.rank_template(expression)
+#' rank_template <- dirac.rank_template(rank_matrix)
 #' dirac.rank_matching_score.vector(rank_matrix, rank_template)
 #' @export
 dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
-  apply(rank_matrix,2, dirac.rank_matching_score,
+  apply(rank_matrix, 2, dirac.rank_matching_score,
         rank_template=rank_template)
 }
 
@@ -375,7 +379,7 @@ dirac.rank_matching_score.vector <- function(rank_matrix, rank_template){
 #' @examples
 #' expression <-  matrix(1:16, ncol=4, nrow=4)
 #' rank_matrix <-dirac.rank_matrix(expression)
-#' rank_template <- dirac.rank_template(expression)
+#' rank_template <- dirac.rank_template(rank_matrix)
 #' dirac.rank_conservation_index(rank_matrix, rank_template)
 #' @export
 dirac.rank_conservation_index <- function(rank_matrix, rank_template){
@@ -487,6 +491,8 @@ dirac.classification_rate <- function(gene_index, expression, phenotype1,
 #' @param cores Integer, indicates number of cores to use for parallel
 #'    calculations. If greater than parallel::detectCores() return value,
 #'    will instead be set to said return value.
+#' @param as.frame Boolean, whether return value should be data.frame or named
+#'    list, see return for more information.
 #'
 #' @returns
 #'    if as.frame is TRUE:
@@ -670,8 +676,8 @@ dirac.compare_phenotype.shuffle <- function(i,rank_matrix, combined, p1.size,
 #'    two phenotypes
 #' @param gene_index Numeric vector representing the indices of the genes in
 #'    the network.
-#' @param bootstrap Number of bootstrap iterations to run for computing
-#'    the null distribution for calculating the p-value
+#' @param bootstrap_iterations Number of bootstrap iterations to run for
+#'   computing the null distribution for calculating the p-value
 #' @param parallel Boolean determining if calculation should be run in parallel,
 #'    on unix systems it uses the mclapply function, and on windows it creates
 #'    a socket cluster and uses parLapply.
@@ -750,7 +756,7 @@ dirac.compare_phenotype <- function(gene_index, expression, phenotype1,
                          p1.size=p1.size, p2.size=p1.size, replace=replace))
   }
   # Now, use the bootstrapped values to create an empirical cdf
-  boot_cdf <- ecdf(res)
+  boot_cdf <- stats::ecdf(res)
   # Get the p-value for the value
   pval <- 1-boot_cdf(abs_rci_diff)
   # Return named list with value being the difference, and pval being

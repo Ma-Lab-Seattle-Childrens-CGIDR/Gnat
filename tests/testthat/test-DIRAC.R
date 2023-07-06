@@ -277,7 +277,7 @@ testthat::test_that("Compare phenotype works",{
   compare_phenotype_parallel.expected <- list(value=0, pval=0.9)
   compare_phenotype_parallel.actual <- dirac.compare_phenotype(
     c(1,2,3,4), expression, c(1,2,3,4), c(5,6,7,8), bootstrap_iterations = 20,
-    parallel=TRUE, replace=TRUE, seed=42
+    parallel=TRUE, cores=2, replace=TRUE, seed=42
   )
   expect_equal(compare_phenotype_parallel.actual,
                compare_phenotype_parallel.expected)

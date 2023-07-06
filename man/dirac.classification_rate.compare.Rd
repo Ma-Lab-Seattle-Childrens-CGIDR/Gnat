@@ -31,14 +31,17 @@ requires foreach, and doParallel.}
 \item{cores}{Integer, indicates number of cores to use for parallel
 calculations. If greater than parallel::detectCores() return value,
 will instead be set to said return value.}
+
+\item{as.frame}{Boolean, whether return value should be data.frame or named
+list, see return for more information.}
 }
 \value{
-if as.frame is FALSE:
-Numeric vector containing the classification rate for each of the
-provided gene networks. Named based on names of gene_index argument.
 if as.frame is TRUE:
 data.frame with gene_network names as one column, and classification
 rate as another.
+if as.frame is FALSE:
+Numeric vector containing the classification rate for each of the
+provided gene networks. Named based on names of gene_index argument.
 }
 \description{
 \code{dirac.classification_rate.compare} compares the classification rate between

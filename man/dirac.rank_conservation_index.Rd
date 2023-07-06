@@ -22,6 +22,6 @@ gene expression data
 \examples{
 expression <-  matrix(1:16, ncol=4, nrow=4)
 rank_matrix <-dirac.rank_matrix(expression)
-rank_template <- dirac.rank_template(expression)
+rank_template <- dirac.rank_template(rank_matrix)
 dirac.rank_conservation_index(rank_matrix, rank_template)
 }

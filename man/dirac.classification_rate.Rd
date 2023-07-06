@@ -4,20 +4,19 @@
 \alias{dirac.classification_rate}
 \title{Find the classification rate for single network}
 \usage{
-dirac.classification_rate(expression, phenotype1, phenotype2, gene_index)
+dirac.classification_rate(gene_index, expression, phenotype1, phenotype2)
 }
 \arguments{
+\item{gene_index}{Numeric vector of index for genes in network}
+
 \item{expression}{Numeric matrix with gene expression data, rows are genes
 columns are samples.}
 
 \item{phenotype1, phenotype2}{Numeric vectors containing the indexes for the
 two phenotypes to compare.}
-
-\item{gene_index}{Numeric vector of index for genes in network}
 }
 \value{
-List of floats, representing the classification rate for each
-network. Names will be taken from the gene_index list.
+Float representing the classification rate based on DIRAC
 }
 \description{
 \code{dirac.classification_rate} Finds the classification rate between two
@@ -28,6 +27,10 @@ Classification rate is defined as the average between sensitivity and
 specificity. classification_rate =
 Pr(rank_diff>0|phenotype=A)*Pr(phenotype=A) +
 Pr(rank_diff<=0|phenotype=B)*Pr(phenotype=B)
+
+Due to the way that the classification rate splits 0's, this value depends
+on the ordering of the gene_index vector. The order of this vector should
+therefor be kept consistent.
 }
 \examples{
 # example code

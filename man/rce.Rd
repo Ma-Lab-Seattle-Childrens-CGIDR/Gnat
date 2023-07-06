@@ -38,12 +38,12 @@ unix systems creates fork cluster, on windows creates a psock cluster}
 \item{cores}{Integer describing number of cores to use for parallel
 operation.}
 
-\item{replace}{Boolean, describing weather the phenotype samples should be
+\item{replace}{Boolean, describing whether the phenotype samples should be
 taken with replacement}
 
 \item{seed1, seed2}{Seeds to use for sampling the respective phenotypes}
 
-\item{as.frame}{Boolean, describing weather the results should be returned
+\item{as.frame}{Boolean, describing whether the results should be returned
 as a data.frame}
 }
 \value{
@@ -58,4 +58,31 @@ of the gene_index_list
 For each of the gene networks described by the gene_index_list, calculates
 the p-values for the difference in rank conservation entropy between
 the two phenotypes.
+}
+\examples{
+# Create example random expression data
+expression <- matrix(runif(50*120, min=1, max=500000), ncol=50)
+# Create list of integer vectors representing different gene networks
+gene_index_list <- list(
+  gene_network_A = c(34,35,36,40,47,101),
+  gene_network_B = c(115,116,120),
+  gene_network_C = c(1,5,17,19,20,25,31,33)
+)
+# Create integer vector representing indices of phenotype1 and phenotype2
+phenotype1 <- sample(50, 20,replace=FALSE)
+phenotype2 <- sample(50, 15,replace=FALSE)
+# Run the RCE
+results <- rce(expression, gene_index_list, phenotype1, phenotype2,
+  iterations=100, parallel=FALSE, replace=TRUE, seed1=42, seed2=314,
+  as.frame=TRUE)
+# Show results
+print(results)
+# Repeat using parallel operation
+results <- rce(expression, gene_index_list, phenotype1, phenotype2,
+  iterations=100, parallel=FALSE, cores=2, replace=TRUE, seed1=42, seed2=314,
+  as.frame=TRUE)
+# View the results, note likely not the same due to small number of
+# iterationsand the different ways that random number generation is handled
+# between serial and parallel operation
+print(results)
 }

@@ -26,6 +26,9 @@ represent genes, and columns represent samples.}
 \item{phenotype1, phenotype2}{Numeric vectors representing the indices of
 two phenotypes}
 
+\item{bootstrap_iterations}{Number of bootstrap iterations to run for
+computing the null distribution for calculating the p-value}
+
 \item{parallel}{Boolean determining if calculation should be run in parallel,
 on unix systems it uses the mclapply function, and on windows it creates
 a socket cluster and uses parLapply.}
@@ -43,9 +46,6 @@ and the remainder of combined is taken as the other sample.}
 
 \item{seed}{Integer, used to set the seed for the random number generator
 used for sampling.}
-
-\item{bootstrap}{Number of bootstrap iterations to run for computing
-the null distribution for calculating the p-value}
 }
 \value{
 A named list, with value equal to the absolute difference in rank

@@ -30,6 +30,9 @@ parallel.}
 \item{cores}{Integer, indicates number of cores to use for parallel
 calculations. If greater than parallel::detectCores() return value,
 will instead be set to said return value.}
+
+\item{as.frame}{Boolean, whether the return value should be a dataframe or
+a named list.}
 }
 \value{
 if as.frame is TRUE:
