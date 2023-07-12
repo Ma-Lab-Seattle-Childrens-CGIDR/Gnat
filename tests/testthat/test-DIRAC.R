@@ -48,12 +48,12 @@ testthat::test_that("Compare phenotypes works",{
     phenotype_comp.expected <- data.frame(
       gene_network=c("A","B","C"),
       value=c(0,0,0),
-      pval=c(0.85,0.65,0.9)
+      p.value=c(0.85,0.65,0.9)
     )} else if(os_type=="unix"){
       phenotype_comp.expected <- data.frame(
         gene_network=c("A","B","C"),
         value=c(0,0,0),
-        pval=c(0.95,0.70,0.9))
+        p.value=c(0.95,0.70,0.9))
     }
   rownames(phenotype_comp.expected) <- c("A","B","C")
   phenotype_comp.actual <-
@@ -66,7 +66,7 @@ testthat::test_that("Compare phenotypes works",{
   phenotype_comp.serial.expected <- data.frame(
     gene_network=c("A","B","C"),
     value=c(0,0,0),
-    pval=c(0.7,0.8,0.85)
+    p.value=c(0.7,0.8,0.85)
   )
   rownames(phenotype_comp.serial.expected) <- c("A","B","C")
   phenotype_comp.serial.actual <-
@@ -276,14 +276,14 @@ testthat::test_that("Compare phenotype works",{
   # Create test expression set
   set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
-  compare_phenotype_serial.expected <- list(value=0, pval=0.8)
+  compare_phenotype_serial.expected <- list(value=0, p.value=0.8)
   compare_phenotype_serial.actual <- dirac.compare_phenotype(
     c(1,2,3,4), expression, c(1,2,3,4), c(5,6,7,8), bootstrap_iterations = 20,
     parallel=FALSE, replace=TRUE, seed=42
   )
   expect_equal(compare_phenotype_serial.actual,
                compare_phenotype_serial.expected)
-  compare_phenotype_parallel.expected <- list(value=0, pval=0.9)
+  compare_phenotype_parallel.expected <- list(value=0, p.value=0.9)
   compare_phenotype_parallel.actual <- dirac.compare_phenotype(
     c(1,2,3,4), expression, c(1,2,3,4), c(5,6,7,8), bootstrap_iterations = 20,
     parallel=TRUE, cores=2, replace=TRUE, seed=42

@@ -90,11 +90,10 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #'      rank conservation index, and p-value of the absolute rank conservation
 #'      index.
 #'    If as.frame is FALSE:
-#'      A list named according to the names in the
-#'      gene_index argument, with each entry being a named list, with `$value`
-#'      equal to the absolute difference in rank conservation scores between the
-#'      two phenotypes, and `$p.value` equal to the p-value for `$value` found with
-#'      bootstrapping.
+#'      A list named according to the names in the gene_index argument, with
+#'      each entry being a named list, with `$value` equal to the absolute
+#'      difference in rank conservation scores between the two phenotypes, and
+#'      `$p.value` equal to the p-value for `$value` found with bootstrapping.
 #' @examples
 #' # example code
 #' @export

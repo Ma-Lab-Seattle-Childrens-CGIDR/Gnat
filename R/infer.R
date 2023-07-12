@@ -48,7 +48,8 @@ INFER <- function(expression, gene_network_list,
   # Run the infer.compare_phenotypes
   res_list <- lapply(gene_network_list, infer.compare_phenotypes,
                      expression=expression,
-                     phenotype1=phenotype2,
+                     phenotype1=phenotype1,
+                     phenotype2=phenotype2,
                      bootstrap_iterations=bootstrap_iterations,
                      parallel=parallel, cores=cores, replace = replace,
                      seed=seed)
@@ -56,8 +57,8 @@ INFER <- function(expression, gene_network_list,
     names(res_list) <- names(gene_network_list)
     return(res_list)
   } else {
-    p1.rank_entropy.list <- sapple(res_list, function(x) x$p1.rank_entropy)
-    p2.rank_entropy.list <- sapple(res_list, function(x) x$p2.rank_entropy)
+    p1.rank_entropy.list <- sapply(res_list, function(x) x$p1.rank_entropy)
+    p2.rank_entropy.list <- sapply(res_list, function(x) x$p2.rank_entropy)
     values.list <- sapply(res_list, function(x) x$absolute_difference)
     p.values.list <- sapply(res_list, function(x) x$p.value)
     gene_networks.names <- names(gene_network_list)
@@ -97,7 +98,7 @@ INFER <- function(expression, gene_network_list,
 #'   print(entropy.vector(example_vector))
 entropy.vector <- function(vec){
   t <- table(vec)/length(vec)
-  sum(t*log2(t))
+  -sum(t*log2(t))
 }
 
 
@@ -116,7 +117,7 @@ entropy.vector <- function(vec){
 #'   example_matrix <- matrix(rnorm(4*4), ncol=4)
 #'   # Print result vector
 #'   print(entropy.matrix(example_matrix, 2))
-entropy.matrix <- function(mat, margin=2){
+entropy.matrix <- function(mat, margin=1){
   apply(mat, MARGIN = margin, entropy.vector)
 }
 
@@ -186,7 +187,7 @@ infer.gene_network.entropy <- function(expression, gene_network, phenotype){
 
 #' Calculate the absolute difference in rank entropies between two phenotypes
 #'
-#' `infer.compare_phenotypessingle` computes the rank entropy for each of two
+#' `infer.compare_phenotypes.single` computes the rank entropy for each of two
 #' phenotypes, and returns the absolute value of the difference between them
 #'
 #' @param rank_matrix Integer matrix representing the gene expression ranks,
@@ -206,8 +207,8 @@ infer.compare_phenotypes.single <- function(rank_matrix,
   p1.rank_matrix <- rank_matrix[,phenotype1]
   p2.rank_matrix <- rank_matrix[,phenotype2]
   # Get the rank entropies for each phenotype
-  p1.rank_entropy <- entropy.matrix(p1.rank_matrix, margin = 2)
-  p2.rank_entropy <- entropy.matrix(p2.rank_matrix, margin = 2)
+  p1.rank_entropy <- mean(entropy.matrix(p1.rank_matrix, margin = 1))
+  p2.rank_entropy <- mean(entropy.matrix(p2.rank_matrix, margin = 1))
   # Return the absolute value of the differences between the rank entropies
   abs(p1.rank_entropy-p2.rank_entropy)
 
@@ -250,7 +251,7 @@ infer.compare_phenotypes.shuffle <- function(i, rank_matrix, combined,
   }
   # Compute the absolute difference in rank entropies between the shuffled
   #   phenotypes
-  infer.compare_phenotypessingle(rank_matrix = rank_matrix,
+  infer.compare_phenotypes.single(rank_matrix = rank_matrix,
                                  phenotype1 = p1.idx,
                                  phenotype2 = p2.idx)
 }
@@ -289,13 +290,13 @@ infer.compare_phenotypes <- function(gene_network, expression,
   # Compute the rank_matrix
   rank_matrix <- infer.rank_matrix(expression[gene_network, combined])
   # Find the difference value for the unshuffled phenotype
-  abs_re_diff <- infer.compare_phenotypessingle(rank_matrix = rank_matrix,
+  abs_re_diff <- infer.compare_phenotypes.single(rank_matrix = rank_matrix,
                                                 phenotype1 = phenotype1,
                                                 phenotype2 = phenotype2)
-  p1.rank_entropy <- infer.gene_network.entropy(gene_expression=expression,
+  p1.rank_entropy <- infer.gene_network.entropy(expression=expression,
                                                 gene_network = gene_network,
                                                 phenotype = phenotype1)
-  p2.rank_entropy <- infer.gene_network.entropy(gene_expression=expression,
+  p2.rank_entropy <- infer.gene_network.entropy(expression=expression,
                                                 gene_network = gene_network,
                                                 phenotype = phenotype2)
   # Perform bootstrapping for the null distribution
@@ -309,12 +310,12 @@ infer.compare_phenotypes <- function(gene_network, expression,
       set.seed(seed, "L'Ecuyer")
       # Use multicore apply
       res <- unlist(parallel::mclapply(1:bootstrap_iterations,
-                                       infer.compare_phenotypesshuffle,
+                                       infer.compare_phenotypes.shuffle,
                                        rank_matrix=rank_matrix,
                                        combined=combined, p1.size=p1.size,
                                        p2.size=p2.size, replace=replace,
                                        mc.cores=cores))
-    } else if (os_type="windows"){
+    } else if (os_type=="windows"){
       # make the cluster
       cl <- parallel::makeCluster(cores)
       # Set the RNG stream seed
@@ -322,12 +323,12 @@ infer.compare_phenotypes <- function(gene_network, expression,
       # Export needed functions
       parallel::clusterExport(cl, list("entropy.vector",
                                        "entropy.matrix",
-                                       "infer.compare_phenotypessingle",
-                                       "infer.compare_phenotypesshuffle"))
+                                       "infer.compare_phenotypes.single",
+                                       "infer.compare_phenotypes.shuffle"))
       # Run the bootstrap
       res <- tryCatch(expr = {
         unlist(parallel::parLapply(cl, 1:bootstrap_iterations,
-                                   infer.compare_phenotypesshuffle,
+                                   infer.compare_phenotypes.shuffle,
                                    rank_matrix=rank_matrix,
                                    combined=combined,
                                    p1.size=p1.size,
@@ -341,7 +342,7 @@ infer.compare_phenotypes <- function(gene_network, expression,
   } else {
     set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
     res <- unlist(lapply(1:bootstrap_iterations,
-                         infer.compare_phenotypesshuffle,
+                         infer.compare_phenotypes.shuffle,
                          rank_matrix=rank_matrix,
                          combined=combined,
                          p1.size=p1.size,
