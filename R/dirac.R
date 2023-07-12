@@ -93,7 +93,7 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #'      A list named according to the names in the
 #'      gene_index argument, with each entry being a named list, with `$value`
 #'      equal to the absolute difference in rank conservation scores between the
-#'      two phenotypes, and `$pval` equal to the p-value for `$value` found with
+#'      two phenotypes, and `$p.value` equal to the p-value for `$value` found with
 #'      bootstrapping.
 #' @examples
 #' # example code
@@ -101,7 +101,7 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 DIRAC.compare_phenotypes <- function(expression, phenotype1, phenotype2,
                                      gene_index, bootstrap_iterations=1000,
                                      parallel=TRUE, cores=4, replace=TRUE,
-                                     seed, as.frame=TRUE){
+                                     seed=NULL, as.frame=TRUE){
   # Run the dirac.commpare phenotype function for each of the gene networks
   res_list <- lapply(gene_index, dirac.compare_phenotype,
                      expression=expression,
@@ -116,12 +116,12 @@ DIRAC.compare_phenotypes <- function(expression, phenotype1, phenotype2,
   } else{
     # Get the values
     values.list <- sapply(res_list, function(x) x$value)
-    pvals.list <- sapply(res_list, function(x) x$pval)
+    p.values.list <- sapply(res_list, function(x) x$p.value)
     gene_networks.list <- names(gene_index)
     res_frame <- data.frame(
       gene_network=gene_networks.list,
       value=values.list,
-      pval=pvals.list
+      p.value=p.values.list
     )
     return(res_frame)
   }
@@ -693,7 +693,7 @@ dirac.compare_phenotype.shuffle <- function(i,rank_matrix, combined, p1.size,
 #' @param seed Integer, used to set the seed for the random number generator
 #'    used for sampling.
 #' @returns A named list, with value equal to the absolute difference in rank
-#'    conservation scores between the two phenotypes, and pval equal to the
+#'    conservation scores between the two phenotypes, and p.value equal to the
 #'    p-value found with bootstrapping.
 #' @examples
 #' # example code
@@ -758,10 +758,10 @@ dirac.compare_phenotype <- function(gene_index, expression, phenotype1,
   # Now, use the bootstrapped values to create an empirical cdf
   boot_cdf <- stats::ecdf(res)
   # Get the p-value for the value
-  pval <- 1-boot_cdf(abs_rci_diff)
-  # Return named list with value being the difference, and pval being
-  #   the pval calculated using the empirical cdf
-  list(value=abs_rci_diff, pval=pval)
+  p.value <- 1-boot_cdf(abs_rci_diff)
+  # Return named list with value being the difference, and p.value being
+  #   the p.value calculated using the empirical cdf
+  list(value=abs_rci_diff, p.value=p.value)
 }
 
 

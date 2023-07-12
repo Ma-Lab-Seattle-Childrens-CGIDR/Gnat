@@ -80,11 +80,11 @@ testthat::test_that("Comparing phenotypes using rank correlation entropy works",
     gene_index, expression.combined, p1.index, p2.index,
     bootstrap_iterations=100, parallel=FALSE, replace=TRUE, seed1=123,
     seed2=456)})
-  expect_true(result<0.0001)
+  expect_true(result$p.value<0.0001)
   # Repeat, now with parallel operation
   suppressWarnings({result.parallel <- rce.compare_phenotypes(
     gene_index, expression.combined, p1.index, p2.index,
     bootstrap_iterations=100, parallel=TRUE, cores=2, replace=TRUE, seed1=123,
     seed2=456)})
-  expect_true(result.parallel<0.0001)
+  expect_true(result.parallel$p.value<0.0001)
 })
