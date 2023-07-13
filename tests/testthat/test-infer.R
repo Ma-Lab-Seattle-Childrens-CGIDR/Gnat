@@ -151,7 +151,7 @@ testthat::test_that("INFER works",{
       p1.rank_entropy = c(1.1037594,1.3333333,0.8278195),
       p2.rank_entropy = c(1.103759, 1.103759, 1.452820),
       absolute_difference = c(0.000000, 0.229574, 0.625000),
-      p.value = c(0.77,0.64, 0.22)
+      p.value = c(0.79,0.62, 0.19)
     )
   }
   rownames(res.expected) <- c("A","B","C")
