@@ -90,7 +90,7 @@ RACE <- function(expression, gene_network_list,
 #' # Print the result
 #' print(race.mean_rank_corr(mat))
 race.mean_rank_corr <- function(expression.filtered){
-  correlation <- cor(expression.filtered, method="kendall")
+  correlation <- stats::cor(expression.filtered, method="kendall")
   mean(correlation[lower.tri(correlation)])
 }
 

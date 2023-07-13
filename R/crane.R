@@ -155,7 +155,7 @@ crane.compare_phenotypes.shuffle <- function(i, rank_matrix, combined,
 #'
 #' @param expression Numeric matrix representing gene expression, rows
 #'    represent genes, and columns represent samples
-#' @param gene_network_list Integer vector containing the indices of the genes
+#' @param gene_network Integer vector containing the indices of the genes
 #'    within the network
 #' @param phenotype1,phenotype2 Integer vectors of indices of the samples
 #'    in each phenotype.

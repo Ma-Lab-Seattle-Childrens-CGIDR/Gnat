@@ -13,8 +13,8 @@ rce(
   parallel = TRUE,
   cores = 4,
   replace = TRUE,
-  seed1,
-  seed2,
+  seed1 = NULL,
+  seed2 = NULL,
   as.frame = TRUE
 )
 }

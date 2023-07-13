@@ -13,7 +13,7 @@ DIRAC.compare_phenotypes(
   parallel = TRUE,
   cores = 4,
   replace = TRUE,
-  seed,
+  seed = NULL,
   as.frame = TRUE
 )
 }
@@ -58,11 +58,10 @@ a dataframe with columns for gene network name
 rank conservation index, and p-value of the absolute rank conservation
 index.
 If as.frame is FALSE:
-A list named according to the names in the
-gene_index argument, with each entry being a named list, with \verb{$value}
-equal to the absolute difference in rank conservation scores between the
-two phenotypes, and \verb{$pval} equal to the p-value for \verb{$value} found with
-bootstrapping.
+A list named according to the names in the gene_index argument, with
+each entry being a named list, with \verb{$value} equal to the absolute
+difference in rank conservation scores between the two phenotypes, and
+\verb{$p.value} equal to the p-value for \verb{$value} found with bootstrapping.
 }
 \description{
 \code{DIRAC.compare_phenotypes} computes the absolute difference between the rank

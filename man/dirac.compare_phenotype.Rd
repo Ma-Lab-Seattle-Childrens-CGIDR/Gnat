@@ -49,7 +49,7 @@ used for sampling.}
 }
 \value{
 A named list, with value equal to the absolute difference in rank
-conservation scores between the two phenotypes, and pval equal to the
+conservation scores between the two phenotypes, and p.value equal to the
 p-value found with bootstrapping.
 }
 \description{
