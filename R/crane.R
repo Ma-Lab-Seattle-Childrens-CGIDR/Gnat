@@ -96,7 +96,7 @@ crane.rank_matrix <- function(expression.filtered){
 crane.mean_centroid_distance <- function(rank_matrix){
   centroid <- apply(rank_matrix, MARGIN=1, mean, na.rm=TRUE)
   sd <- (rank_matrix-centroid)^2
-  mean(apply(sd, MARGIN=2, mean))
+  mean(sqrt(apply(sd, MARGIN=2, sum)))
 }
 
 #' Compare phenotypes using the mean rank centroid distance
