@@ -353,11 +353,11 @@ infer.compare_phenotypes <- function(gene_network, expression,
   # Now create the ECDF
   boot_cdf <- stats::ecdf(res)
   # Get the p-value for the absolute rank entropy difference
-  pval <- 1-boot_cdf(abs_re_diff)
+  p.value <- 1-boot_cdf(abs_re_diff)
   # Return named list with value being the absolute difference, and
   #   p.value being the p-value calculated using the ecdf
   list(p1.rank_entropy = p1.rank_entropy, p2.rank_entropy = p2.rank_entropy,
-       absolute_difference=abs_re_diff, p.value=pval)
+       absolute_difference=abs_re_diff, p.value=p.value)
 }
 
 
