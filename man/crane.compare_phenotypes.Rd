@@ -17,6 +17,9 @@ crane.compare_phenotypes(
 )
 }
 \arguments{
+\item{gene_network}{Integer vector containing the indices of the genes
+within the network}
+
 \item{expression}{Numeric matrix representing gene expression, rows
 represent genes, and columns represent samples}
 
@@ -35,9 +38,6 @@ parallel}
 bootstrap operations.}
 
 \item{seed}{Integer seed for RNG}
-
-\item{gene_network_list}{Integer vector containing the indices of the genes
-within the network}
 }
 \value{
 Named list, with p1.mean_centroid_distance,
