@@ -86,38 +86,38 @@ print("DIRAC results")
 #> [1] "DIRAC results"
 print(DIRAC.results)
 #>   gene_network      value p.value
-#> A            A 0.21428571   0.051
-#> B            B 0.07142857   0.556
-#> C            C 0.00000000   0.857
+#> A            A 0.21428571   0.031
+#> B            B 0.07142857   0.395
+#> C            C 0.00000000   0.826
 print("INFER results")
 #> [1] "INFER results"
 print(INFER.results)
 #>   gene_network p1.rank_entropy p2.rank_entropy absolute_difference p.value
-#> A            A       0.7273967        1.923252           1.1958551   0.003
-#> B            B       0.7884505        1.824863           1.0364125   0.008
-#> C            C       0.5754137        1.378783           0.8033698   0.025
+#> A            A       0.7273967        1.437193           0.7097965   0.020
+#> B            B       0.7884505        1.583617           0.7951665   0.009
+#> C            C       0.5754137        1.306889           0.7314757   0.045
 print("CRANE results")
 #> [1] "CRANE results"
 print(CRANE.results)
 #>   gene_network p1.mean_centroid_distance p2.mean_centroid_distance
-#> A            A                 0.7350120                  2.135811
-#> B            B                 0.8111936                  2.217456
-#> C            C                 0.5772300                  1.255934
+#> A            A                 0.7350120                  1.692926
+#> B            B                 0.8111936                  1.849458
+#> C            C                 0.5772300                  1.159586
 #>   absolute_difference p.value
-#> A           1.4007994   0.004
-#> B           1.4062625   0.004
-#> C           0.6787035   0.044
+#> A           0.9579138   0.034
+#> B           1.0382647   0.021
+#> C           0.5823562   0.114
 print("RACE results")
 #> [1] "RACE results"
 print(RACE.results)
 #>   gene_network p1.mean_rank_correlation p2.mean_rank_correlation
-#> A            A                0.7460317              -0.07936508
-#> B            B                0.7142857              -0.14285714
-#> C            C                0.6825397              -0.01587302
+#> A            A                0.7460317                0.2063492
+#> B            B                0.7142857                0.1111111
+#> C            C                0.6825397                0.1111111
 #>   absolute_difference p.value
-#> A           0.8253968   0.003
-#> B           0.8571429   0.004
-#> C           0.6984127   0.030
+#> A           0.5396825   0.038
+#> B           0.6031746   0.017
+#> C           0.5714286   0.070
 ```
 
 # Method Details
@@ -177,7 +177,7 @@ rank grouping score. Then, similar to RACE and INFER a permutation
 testing approach can be used to calculate the statistical significance
 of the difference in rank grouping scores between two phenotypes.
 
-## References
+# References
 
 \[1\] Eddy, J. A., Hood, L., Price, N. D., & Geman, D. (2010).
 Identifying tightly regulated and variably expressed networks by

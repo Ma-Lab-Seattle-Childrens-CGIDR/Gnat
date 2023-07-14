@@ -116,7 +116,7 @@ This method employs the Kendall Rank Correlation Coefficient between all of the 
 
 For each sample, a rank vector is calculated, and then the centroid of all the rank vectors within a phenotype is found. The average Euclidean distance between the samples and the centroid provides the phenotype's rank grouping score. Then, similar to RACE and INFER a permutation testing approach can be used to calculate the statistical significance of the difference in rank grouping scores between two phenotypes. 
 
-## References
+# References
 
 [1] Eddy, J. A., Hood, L., Price, N. D., & Geman, D. (2010). Identifying tightly
 regulated and variably expressed networks by Differential Rank Conservation (DIRAC). 
