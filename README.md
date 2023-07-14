@@ -86,38 +86,38 @@ print("DIRAC results")
 #> [1] "DIRAC results"
 print(DIRAC.results)
 #>   gene_network      value p.value
-#> A            A 0.21428571   0.038
-#> B            B 0.07142857   0.432
-#> C            C 0.00000000   0.854
+#> A            A 0.21428571   0.051
+#> B            B 0.07142857   0.556
+#> C            C 0.00000000   0.857
 print("INFER results")
 #> [1] "INFER results"
 print(INFER.results)
 #>   gene_network p1.rank_entropy p2.rank_entropy absolute_difference p.value
-#> A            A       0.7273967        1.529696           0.8022998   0.028
-#> B            B       0.7884505        1.556657           0.7682063   0.023
-#> C            C       0.5754137        1.139757           0.5643436   0.125
+#> A            A       0.7273967        1.923252           1.1958551   0.003
+#> B            B       0.7884505        1.824863           1.0364125   0.008
+#> C            C       0.5754137        1.378783           0.8033698   0.025
 print("CRANE results")
 #> [1] "CRANE results"
 print(CRANE.results)
 #>   gene_network p1.mean_centroid_distance p2.mean_centroid_distance
-#> A            A                 0.7350120                  1.825579
-#> B            B                 0.8111936                  1.909748
-#> C            C                 0.5772300                  1.293335
+#> A            A                 0.7350120                  2.135811
+#> B            B                 0.8111936                  2.217456
+#> C            C                 0.5772300                  1.255934
 #>   absolute_difference p.value
-#> A           1.0905669   0.013
-#> B           1.0985548   0.007
-#> C           0.7161047   0.039
+#> A           1.4007994   0.004
+#> B           1.4062625   0.004
+#> C           0.6787035   0.044
 print("RACE results")
 #> [1] "RACE results"
 print(RACE.results)
 #>   gene_network p1.mean_rank_correlation p2.mean_rank_correlation
-#> A            A                0.7460317               0.17460317
-#> B            B                0.7142857               0.04761905
-#> C            C                0.6825397               0.04761905
+#> A            A                0.7460317              -0.07936508
+#> B            B                0.7142857              -0.14285714
+#> C            C                0.6825397              -0.01587302
 #>   absolute_difference p.value
-#> A           0.5714286   0.017
-#> B           0.6666667   0.005
-#> C           0.6349206   0.057
+#> A           0.8253968   0.003
+#> B           0.8571429   0.004
+#> C           0.6984127   0.030
 ```
 
 # Method Details
@@ -134,7 +134,7 @@ a rank matching score, representing the fraction of values in the
 samples ordering vector that match the rank templates. From this, a rank
 conservation index is calculated, essentially the average of the rank
 matching score for all samples within a phenotype. Additionally, DIRAC
-can be used for classificiation, by comparing how well a sample’s
+can be used for classification, by comparing how well a sample’s
 pairwise rank ordering vector matches the phenotypes rank template. See
 Eddy et al., 2010 for further details.
 
@@ -145,8 +145,8 @@ compare how tightly regulated the network is between two phenotypes.
 First a rank matrix is computed from the expression data. For each gene
 within the network, the information entropy
 $H(x) = -\sum_{x \in X} p(x) \log p(x)$ (where $X$ is all possible
-values of the rank, i.e. $1,...,n$, $n$ being the number of genes in the
-network) of its ranks across samples is calculated, called the rank
+values of the rank, i.e. $1,\ldots,n$, $n$ being the number of genes in
+the network) of its ranks across samples is calculated, called the rank
 entropy. The average of the rank entropy for each gene in the network is
 taken to provide a score for the rank entropy of the network. This score
 can then be compared between two phenotypes using a permutation test
@@ -176,6 +176,8 @@ distance between the samples and the centroid provides the phenotype’s
 rank grouping score. Then, similar to RACE and INFER a permutation
 testing approach can be used to calculate the statistical significance
 of the difference in rank grouping scores between two phenotypes.
+
+## References
 
 \[1\] Eddy, J. A., Hood, L., Price, N. D., & Geman, D. (2010).
 Identifying tightly regulated and variably expressed networks by

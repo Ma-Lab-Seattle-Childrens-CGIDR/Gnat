@@ -8,7 +8,7 @@ DIRAC.compare_phenotypes(
   expression,
   phenotype1,
   phenotype2,
-  gene_index,
+  gene_index_list,
   bootstrap_iterations = 1000,
   parallel = TRUE,
   cores = 4,
@@ -24,8 +24,8 @@ represent genes, and columns represent samples.}
 \item{phenotype1, phenotype2}{Numeric vectors representing the indices of
 two phenotypes}
 
-\item{gene_index}{A list of numeric vectors, each representing the indices
-of a gene network.}
+\item{gene_index_list}{A list of numeric vectors, each representing the
+indices of a gene network.}
 
 \item{bootstrap_iterations}{Number of bootstrap iterations to run for computing
 the null distribution for calculating the p-value}

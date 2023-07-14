@@ -102,11 +102,11 @@ print(RACE.results)
 ## DIRAC
 
 For each sample, DIRAC creates a binary pairwise ordering vector, \[Gene~1~ < Gene~2~, Gene~1~ < Gene~3~,...\], with a 1 where TRUE, and 0 where FALSE. For population level
-DIRAC, a rank ordering template is created, where if Gene~i~ < Gene~j~ in the majority of the samples, then the corresponding element in the rank template is 1, otherwise it is 0. For each sample, this can then be used to compute a rank matching score, representing the fraction of values in the samples ordering vector that match the rank templates. From this, a rank conservation index is calculated, essentially the average of the rank matching score for all samples within a phenotype. Additionally, DIRAC can be used for classificiation, by comparing how well a sample's pairwise rank ordering vector matches the phenotypes rank template. See Eddy et al., 2010 for further details. 
+DIRAC, a rank ordering template is created, where if Gene~i~ < Gene~j~ in the majority of the samples, then the corresponding element in the rank template is 1, otherwise it is 0. For each sample, this can then be used to compute a rank matching score, representing the fraction of values in the samples ordering vector that match the rank templates. From this, a rank conservation index is calculated, essentially the average of the rank matching score for all samples within a phenotype. Additionally, DIRAC can be used for classification, by comparing how well a sample's pairwise rank ordering vector matches the phenotypes rank template. See Eddy et al., 2010 for further details. 
 
 ## INFER
 
-This method uses the information entropy of the rank for each gene to compare how tightly regulated the network is between two phenotypes. First a rank matrix is computed from the expression data. For each gene within the network, the information entropy $H(x) = -\sum_{x \in X} p(x) \log p(x)$ (where $X$ is all possible values of the rank, i.e. $1,...,n$, $n$ being the number of genes in the network) of its ranks across samples is calculated, called the rank entropy. The average of the rank entropy for each gene in the network is taken to provide a score for the rank entropy of the network. This score can then be compared between two phenotypes using a permutation test approach, where the samples are assigned randomly to the two phenotypes to create the null distribution, which can be used to calculate the p-value of the difference in network rank entropy scores between the phenotypes. 
+This method uses the information entropy of the rank for each gene to compare how tightly regulated the network is between two phenotypes. First a rank matrix is computed from the expression data. For each gene within the network, the information entropy $H(x) = -\sum_{x \in X} p(x) \log p(x)$ (where $X$ is all possible values of the rank, i.e. $1,\ldots,n$, $n$ being the number of genes in the network) of its ranks across samples is calculated, called the rank entropy. The average of the rank entropy for each gene in the network is taken to provide a score for the rank entropy of the network. This score can then be compared between two phenotypes using a permutation test approach, where the samples are assigned randomly to the two phenotypes to create the null distribution, which can be used to calculate the p-value of the difference in network rank entropy scores between the phenotypes. 
 
 ## RACE
 
@@ -115,6 +115,8 @@ This method employs the Kendall Rank Correlation Coefficient between all of the 
 ## CRANE
 
 For each sample, a rank vector is calculated, and then the centroid of all the rank vectors within a phenotype is found. The average Euclidean distance between the samples and the centroid provides the phenotype's rank grouping score. Then, similar to RACE and INFER a permutation testing approach can be used to calculate the statistical significance of the difference in rank grouping scores between two phenotypes. 
+
+## References
 
 [1] Eddy, J. A., Hood, L., Price, N. D., & Geman, D. (2010). Identifying tightly
 regulated and variably expressed networks by Differential Rank Conservation (DIRAC). 
