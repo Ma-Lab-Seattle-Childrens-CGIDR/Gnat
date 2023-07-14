@@ -86,38 +86,38 @@ print("DIRAC results")
 #> [1] "DIRAC results"
 print(DIRAC.results)
 #>   gene_network      value p.value
-#> A            A 0.21428571   0.055
-#> B            B 0.07142857   0.521
-#> C            C 0.00000000   0.855
+#> A            A 0.21428571   0.016
+#> B            B 0.07142857   0.402
+#> C            C 0.00000000   0.797
 print("INFER results")
 #> [1] "INFER results"
 print(INFER.results)
 #>   gene_network p1.rank_entropy p2.rank_entropy absolute_difference p.value
-#> A            A       0.7273967        1.601125           0.8737283   0.018
-#> B            B       0.7884505        1.454701           0.6662508   0.056
-#> C            C       0.5754137        1.438075           0.8626609   0.045
+#> A            A       0.7273967        1.454701           0.7273046   0.025
+#> B            B       0.7884505        1.529696           0.7412460   0.041
+#> C            C       0.5754137        1.135002           0.5595881   0.057
 print("CRANE results")
 #> [1] "CRANE results"
 print(CRANE.results)
 #>   gene_network p1.mean_centroid_distance p2.mean_centroid_distance
-#> A            A                 0.7350120                  2.121324
-#> B            B                 0.8111936                  1.901516
-#> C            C                 0.5772300                  1.344085
+#> A            A                 0.7350120                  1.722550
+#> B            B                 0.8111936                  1.629680
+#> C            C                 0.5772300                  1.210507
 #>   absolute_difference p.value
-#> A           1.3863120   0.005
-#> B           1.0903220   0.034
-#> C           0.7668549   0.050
+#> A           0.9875384   0.018
+#> B           0.8184868   0.052
+#> C           0.6332766   0.022
 print("RACE results")
 #> [1] "RACE results"
 print(RACE.results)
 #>   gene_network p1.mean_rank_correlation p2.mean_rank_correlation
-#> A            A                0.7460317              -0.04761905
-#> B            B                0.7142857               0.11111111
-#> C            C                0.6825397              -0.07936508
+#> A            A                0.7460317               0.20634921
+#> B            B                0.7142857               0.26984127
+#> C            C                0.6825397               0.04761905
 #>   absolute_difference p.value
-#> A           0.7936508   0.004
-#> B           0.6031746   0.048
-#> C           0.7619048   0.015
+#> A           0.5396825   0.017
+#> B           0.4444444   0.051
+#> C           0.6349206   0.011
 ```
 
 # Method Details
@@ -145,7 +145,7 @@ compare how tightly regulated the network is between two phenotypes.
 First a rank matrix is computed from the expression data. For each gene
 within the network, the information entropy
 $H(x) = -\sum_{x \in X} p(x) \log p(x)$ (where $X$ is all possible
-values of the rank, i.e. 1,…,$n$, $n$ being the number of genes in the
+values of the rank, i.e. 1,…, $n$, $n$ being the number of genes in the
 network) of its ranks across samples is calculated, called the rank
 entropy. The average of the rank entropy for each gene in the network is
 taken to provide a score for the rank entropy of the network. This score
