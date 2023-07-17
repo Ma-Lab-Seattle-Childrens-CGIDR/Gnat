@@ -1,5 +1,5 @@
 test_that("Ordered Vector Creation Works",{
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   res <- datagen.ordered.vector(16, rnbinom, size=5, mu=15)
   # Test that it is the right length
   expect_length(res, 16)
@@ -15,7 +15,7 @@ test_that("Ordered Vector Creation Works",{
 })
 
 test_that("Unordered vector creation works",{
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   res <- datagen.unordered.vector(16, rnbinom, size=5, mu=15)
   expect_length(res, 16)
   expect_true(!all(res==sort(res)))
@@ -85,7 +85,7 @@ test_that("Swap works",{
 })
 
 test_that("Adding noise works",{
-  set.seed(42)
+  set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(1:36, ncol=6)
   noisy <- datagen.noise(expression, rnorm, mean=0, sd=2)
   # Test shape of result

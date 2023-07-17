@@ -30,6 +30,10 @@ If replace is TRUE, will take samples for each phenotype, so the two
 phenotypes may overlap. If replace is FALSE, will take sample for phenotype1,
 then use the remaining indices for phenotype2, so there won't be any overlap}
 }
+\value{
+double, The absolute difference between the rank entropies of the
+shuffled phenotypes
+}
 \description{
 Find the absolute difference between rank entropies for shuffled phenotypes
 }

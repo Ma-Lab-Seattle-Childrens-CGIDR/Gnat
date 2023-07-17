@@ -232,7 +232,8 @@ infer.compare_phenotypes.single <- function(rank_matrix,
 #' phenotypes may overlap. If replace is FALSE, will take sample for phenotype1,
 #' then use the remaining indices for phenotype2, so there won't be any overlap
 #'
-#' @return
+#' @return double, The absolute difference between the rank entropies of the
+#'    shuffled phenotypes
 #' @export
 #'
 #' @examples
