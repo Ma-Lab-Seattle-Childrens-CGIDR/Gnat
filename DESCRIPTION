@@ -1,6 +1,6 @@
 Package: Gnat
 Title: Analyze rank entropy in gene expression networks
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: 
     person("Braden", "Griebel", , "bgriebel@uw.edu", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
@@ -14,4 +14,3 @@ RoxygenNote: 7.2.3
 Suggests: 
     testthat (>= 3.0.0),
 Config/testthat/edition: 3
-Remotes: bioc::3.16/SummarizedExperiment
