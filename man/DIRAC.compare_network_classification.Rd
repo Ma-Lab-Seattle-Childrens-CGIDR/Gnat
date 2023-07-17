@@ -8,7 +8,7 @@ DIRAC.compare_network_classification(
   expression,
   phenotype1,
   phenotype2,
-  gene_index_list,
+  gene_network_list,
   parallel = TRUE,
   cores = 4,
   as.frame = FALSE
@@ -21,7 +21,7 @@ columns are samples}
 \item{phenotype1, phenotype2}{Numeric vectors, contain the indices for the
 samples corresponding to each phenotype.}
 
-\item{gene_index_list}{List of numeric vectors, each containing the indices
+\item{gene_network_list}{List of numeric vectors, each containing the indices
 for one of the gene networks.}
 
 \item{parallel}{Boolean indicating Whether the computation should be run in

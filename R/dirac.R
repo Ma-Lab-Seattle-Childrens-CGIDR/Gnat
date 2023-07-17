@@ -18,7 +18,7 @@
 #'    columns are samples
 #' @param phenotype1,phenotype2 Numeric vectors, contain the indices for the
 #'    samples corresponding to each phenotype.
-#' @param gene_index_list List of numeric vectors, each containing the indices
+#' @param gene_network_list List of numeric vectors, each containing the indices
 #'   for one of the gene networks.
 #' @param parallel Boolean indicating Whether the computation should be run in
 #'   parallel.
@@ -39,12 +39,12 @@
 #' # example code
 #' @export
 DIRAC.compare_network_classification <- function(expression, phenotype1,
-                                                 phenotype2, gene_index_list,
+                                                 phenotype2, gene_network_list,
                                                  parallel = TRUE, cores=4,
                                                  as.frame=FALSE){
   # Wrapper around dirac.classification_rate.compare
   dirac.classification_rate.compare(expression, phenotype1,
-                                    phenotype2, gene_index_list,
+                                    phenotype2, gene_network_list,
                                     parallel, cores,
                                     as.frame)
 
@@ -63,7 +63,7 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #'    represent genes, and columns represent samples.
 #' @param phenotype1,phenotype2 Numeric vectors representing the indices of
 #'    two phenotypes
-#' @param gene_index_list A list of numeric vectors, each representing the
+#' @param gene_network_list A list of numeric vectors, each representing the
 #'   indices of a gene network.
 #' @param bootstrap_iterations Number of bootstrap iterations to run for computing
 #'    the null distribution for calculating the p-value
@@ -98,11 +98,11 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #' # example code
 #' @export
 DIRAC.compare_phenotypes <- function(expression, phenotype1, phenotype2,
-                                     gene_index_list, bootstrap_iterations=1000,
+                                     gene_network_list, bootstrap_iterations=1000,
                                      parallel=TRUE, cores=4, replace=TRUE,
                                      seed=NULL, as.frame=TRUE){
   # Run the dirac.commpare phenotype function for each of the gene networks
-  res_list <- lapply(gene_index_list, dirac.compare_phenotype,
+  res_list <- lapply(gene_network_list, dirac.compare_phenotype,
                      expression=expression,
                      phenotype1=phenotype1,
                      phenotype2=phenotype2,
@@ -110,13 +110,13 @@ DIRAC.compare_phenotypes <- function(expression, phenotype1, phenotype2,
                      parallel=parallel, cores=cores, replace=replace,
                      seed=seed)
   if(!as.frame){
-    names(res_list) <- names(gene_index_list)
+    names(res_list) <- names(gene_network_list)
     return(res_list)
   } else{
     # Get the values
     values.list <- sapply(res_list, function(x) x$value)
     p.values.list <- sapply(res_list, function(x) x$p.value)
-    gene_networks.list <- names(gene_index_list)
+    gene_networks.list <- names(gene_network_list)
     res_frame <- data.frame(
       gene_network=gene_networks.list,
       value=values.list,
