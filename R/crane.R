@@ -183,7 +183,7 @@ crane.compare_phenotypes <- function(gene_network, expression, phenotype1,
   # Get the combined phenotype index vector
   combined <- c(phenotype1, phenotype2)
   # Compute the rank matrix
-  rank_matrix <- crane.rank_matrix(expression[gene_network, combined])
+  rank_matrix <- crane.rank_matrix(expression[gene_network,])
   # Find the centroid difference for the unshuffled phenotypes
   p1.mean_centroid_distance <- crane.mean_centroid_distance(
     rank_matrix[,phenotype1])

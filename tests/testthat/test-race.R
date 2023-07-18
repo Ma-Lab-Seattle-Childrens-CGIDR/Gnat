@@ -114,6 +114,16 @@ test_that("RACE works",{
                result.parallel$p2.mean_rank_correlation)
   expect_true(all(result.serial$p.value<=0.05))
   expect_true(all(result.parallel$p.value<=0.05))
+  expect_equal(
+    abs(result.parallel$p1.mean_rank_correlation -
+          result.parallel$p2.mean_rank_correlation),
+    result.parallel$absolute_difference
+  )
+  expect_equal(
+    abs(result.serial$p1.mean_rank_correlation -
+          result.serial$p2.mean_rank_correlation),
+    result.serial$absolute_difference
+  )
 })
 
 

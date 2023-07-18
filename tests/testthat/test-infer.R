@@ -94,6 +94,11 @@ testthat::test_that("Compare phenotypes works", {
   expect_named(actual.parallel, c("p1.rank_entropy", "p2.rank_entropy",
                                   "absolute_difference", "p.value"))
   expect_gt(actual.parallel$p.value, 0.10)
+  expect_equal(abs(actual.parallel$p1.rank_entropy -
+                     actual.parallel$p2.rank_entropy),
+               actual.parallel$absolute_difference)
+
+
 
   expression2.p1 <- matrix(c(1,2,3,4,5,6,7,8,
                           1,2,3,4,5,6,8,7,
@@ -111,6 +116,9 @@ testthat::test_that("Compare phenotypes works", {
   expect_named(actual2.parallel, c("p1.rank_entropy", "p2.rank_entropy",
                                   "absolute_difference", "p.value"))
   expect_lt(actual2.parallel$p.value, 0.05)
+  expect_equal(abs(actual2.parallel$p1.rank_entropy -
+                     actual2.parallel$p2.rank_entropy),
+               actual2.parallel$absolute_difference)
 
   # Test serial operation
   actual.serial <- infer.compare_phenotypes(
@@ -119,6 +127,9 @@ testthat::test_that("Compare phenotypes works", {
   expect_named(actual.serial, c("p1.rank_entropy", "p2.rank_entropy",
                                    "absolute_difference", "p.value"))
   expect_gt(actual.serial$p.value, 0.10)
+  expect_equal(abs(actual.serial$p1.rank_entropy -
+                     actual.serial$p2.rank_entropy),
+               actual.serial$absolute_difference)
 })
 
 testthat::test_that("INFER works",{
@@ -167,9 +178,13 @@ testthat::test_that("INFER works",{
                       replace=TRUE, seed=42, as.frame=TRUE)
   expect_equal(nrow(res.actual),3)
   expect_equal(ncol(res.actual), 5)
-  expect_equal(colnames(res.expected), c("gene_network", "p1.rank_entropy",
+  expect_equal(colnames(res.actual), c("gene_network", "p1.rank_entropy",
                                          "p2.rank_entropy",
                                          "absolute_difference", "p.value"))
+  expect_equal(
+    abs(res.actual$p1.rank_entropy-res.actual$p2.rank_entropy),
+    res.actual$absolute_difference
+  )
   # Difference due to different RNG between serial and parallel
   if(os_type=="windows"){
     res.expected <- data.frame(

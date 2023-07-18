@@ -53,14 +53,13 @@ list, see return for more information.}
 }
 \value{
 If as.frame is TRUE:
-a dataframe with columns for gene network name
-(determined by the names of the gene_index list), value of absolute
-rank conservation index, and p-value of the absolute rank conservation
-index.
+a dataframe with columns \code{gene_network} (determined by the names of the
+gene_index list),  \code{p1.rank_conservation_index},
+\code{p2.rank_conservation_index}, \code{absolute_difference}, and \code{p.value}.
 If as.frame is FALSE:
 A list named according to the names in the gene_index argument, with
-each entry being a named list, with \verb{$value} equal to the absolute
-difference in rank conservation scores between the two phenotypes, and
+each entry being a named list, with \verb{$p1.rank_conservation_index},
+\verb{$p2.rank_conservation_index}, \verb{$absolute_difference}, and \verb{$p.value}
 \verb{$p.value} equal to the p-value for \verb{$value} found with bootstrapping.
 }
 \description{

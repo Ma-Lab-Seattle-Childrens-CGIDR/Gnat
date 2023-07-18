@@ -211,7 +211,6 @@ infer.compare_phenotypes.single <- function(rank_matrix,
   p2.rank_entropy <- mean(entropy.matrix(p2.rank_matrix, margin = 1))
   # Return the absolute value of the differences between the rank entropies
   abs(p1.rank_entropy-p2.rank_entropy)
-
 }
 
 
@@ -289,7 +288,7 @@ infer.compare_phenotypes <- function(gene_network, expression,
   # Get the combined phenotype index vector
   combined <- c(phenotype1, phenotype2)
   # Compute the rank_matrix
-  rank_matrix <- infer.rank_matrix(expression[gene_network, combined])
+  rank_matrix <- infer.rank_matrix(expression[gene_network,])
   # Find the difference value for the unshuffled phenotype
   abs_re_diff <- infer.compare_phenotypes.single(rank_matrix = rank_matrix,
                                                 phenotype1 = phenotype1,

@@ -106,4 +106,7 @@ test_that("CRANE works",{
                                     "p.value"))
   expect_equal(result$gene_network, c("A","B","C"))
   expect_true(all(result$p.value<=0.1))
+  abs_diff.calculated <- abs(result$p1.mean_centroid_distance -
+                               result$p2.mean_centroid_distance)
+  expect_equal(result$absolute_difference, abs_diff.calculated)
 })

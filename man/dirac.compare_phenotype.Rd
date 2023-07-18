@@ -48,9 +48,8 @@ and the remainder of combined is taken as the other sample.}
 used for sampling.}
 }
 \value{
-A named list, with value equal to the absolute difference in rank
-conservation scores between the two phenotypes, and p.value equal to the
-p-value found with bootstrapping.
+A named list, with p1.rank_conservation_index,
+p2.rank_conservation_index, absolute_difference, and p.value
 }
 \description{
 \code{dirac.compare_phenotype} computes the absolute difference between the rank

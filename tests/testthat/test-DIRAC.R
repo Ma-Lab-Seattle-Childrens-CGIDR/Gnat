@@ -1,5 +1,5 @@
 # Main Function Tests -----------------------------------------------------
-testthat::test_that("Compare Network Classification Works",{
+testthat::test_that("DIRAC Compare Network Classification Works",{
   # Create test expression set
   set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
@@ -34,7 +34,7 @@ testthat::test_that("Compare Network Classification Works",{
 
 })
 
-testthat::test_that("Compare phenotypes works",{
+testthat::test_that("DIRAC Compare phenotypes works",{
   # Get the OS, since the parallel operation is different for the different
   # os, and so with seeding works differently
   os_type = .Platform$OS.type
@@ -47,14 +47,18 @@ testthat::test_that("Compare phenotypes works",{
   if(os_type=="windows"){
     phenotype_comp.expected <- data.frame(
       gene_network=c("A","B","C"),
-      value=c(0,0,0),
-      p.value=c(0.85,0.65,0.9)
+      p1.rank_conservation_index = c(0.75,0.66666666667, 0.625),
+      p2.rank_conservation_index = c(0.75, 0.66666666667, 0.75),
+      absolute_difference = c(0,0,0.125),
+      p.value=c(0.85,0.65,0.35)
     )} else if(os_type=="unix"){
       phenotype_comp.expected <- data.frame(
         gene_network=c("A","B","C"),
-        value=c(0,0,0),
-        p.value=c(0.95,0.70,0.9))
-    }
+        p1.rank_conservation_index = c(0.75,0.66666666667, 0.625),
+        p2.rank_conservation_index = c(0.75, 0.66666666667, 0.75),
+        absolute_difference = c(0,0,0.125),
+        p.value=c(0.85,0.65,0.35)
+    )}
   rownames(phenotype_comp.expected) <- c("A","B","C")
   phenotype_comp.actual <-
     DIRAC.compare_phenotypes(expression, c(1,2,3,4), c(5,6,7,8),
@@ -65,8 +69,10 @@ testthat::test_that("Compare phenotypes works",{
   # Test serial operation
   phenotype_comp.serial.expected <- data.frame(
     gene_network=c("A","B","C"),
-    value=c(0,0,0),
-    p.value=c(0.7,0.8,0.85)
+    p1.rank_conservation_index = c(0.75,0.66666666667, 0.625),
+    p2.rank_conservation_index = c(0.75, 0.66666666667, 0.75),
+    absolute_difference = c(0,0,0.125),
+    p.value=c(0.7,0.8,0.3)
   )
   rownames(phenotype_comp.serial.expected) <- c("A","B","C")
   phenotype_comp.serial.actual <-
@@ -75,9 +81,35 @@ testthat::test_that("Compare phenotypes works",{
                              parallel=FALSE, cores=1, replace=TRUE, seed = 42,
                              as.frame=TRUE)
   expect_equal(phenotype_comp.serial.actual, phenotype_comp.serial.expected)
+
+  # Known positive test
+  expression.p1 <- matrix(c(1,2,3,4,5,6,7,8,
+                            1,2,3,4,5,6,8,7,
+                            1,2,3,4,5,6,7,8,
+                            1,2,3,4,5,7,6,8,
+                            1,3,2,4,5,6,7,8,
+                            1,2,3,4,5,6,7,8,
+                            1,2,3,4,6,5,7,8), ncol=7)
+  expression.p2 <- matrix(runif(7*8, min=1, max=500), ncol = 7)
+  expression <- cbind(expression.p1, expression.p2)
+  gene_network_list <- list(A=c(1,2,3), B=c(4,5,6), C=c(1,5,8))
+  p1=1:7
+  p2=8:14
+  result <- DIRAC.compare_phenotypes(expression, phenotype1=p1,
+                                     phenotype2=p2,
+                                     gene_network_list = gene_network_list,
+                                     bootstrap_iterations = 200,
+                                     parallel=FALSE, cores=1,
+                                     replace=TRUE, seed=42, as.frame=TRUE)
+  expect_true(all(result$p.value<=0.05))
+  expect_equal(
+    abs(result$p1.rank_conservation_index-result$p2.rank_conservation_index),
+    result$absolute_difference
+  )
+
 })
 
-testthat::test_that("Creating a classifier works",{
+testthat::test_that("DIRAC Creating a classifier works",{
   # Create test expression set
   set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
@@ -276,17 +308,34 @@ testthat::test_that("Compare phenotype works",{
   # Create test expression set
   set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
   expression <- matrix(floor(runif(10*8, min=1, max=500000)), ncol=8, nrow=10)
-  compare_phenotype_serial.expected <- list(value=0, p.value=0.8)
+  compare_phenotype_serial.expected <- list(
+    p1.rank_conservation_index = 0.625,
+    p2.rank_conservation_index = 0.75,
+    absolute_difference = 0.125,
+    p.value = 0.05)
   compare_phenotype_serial.actual <- dirac.compare_phenotype(
     c(1,2,3,4), expression, c(1,2,3,4), c(5,6,7,8), bootstrap_iterations = 20,
     parallel=FALSE, replace=TRUE, seed=42
   )
   expect_equal(compare_phenotype_serial.actual,
                compare_phenotype_serial.expected)
-  compare_phenotype_parallel.expected <- list(value=0, p.value=0.9)
+  # Test if the absolute_difference matches the result from
+  # dirac.compare_phenotype.single
+  rank_matrix <- dirac.rank_matrix(expression[c(1,2,3,4),])
+  compare_phenotype.single.result <- dirac.compare_phenotype.single(
+    rank_matrix, c(1,2,3,4), c(5,6,7,8))
+  expect_equal(compare_phenotype_serial.actual$absolute_difference,
+               compare_phenotype.single.result)
+  # Now test the parallel operation
   compare_phenotype_parallel.actual <- dirac.compare_phenotype(
     c(1,2,3,4), expression, c(1,2,3,4), c(5,6,7,8), bootstrap_iterations = 20,
     parallel=TRUE, cores=2, replace=TRUE, seed=42
+  )
+  compare_phenotype_parallel.expected <- list(
+    p1.rank_conservation_index = 0.625,
+    p2.rank_conservation_index = 0.75,
+    absolute_difference = 0.125,
+    p.value = 0.3
   )
   expect_equal(compare_phenotype_parallel.actual,
                compare_phenotype_parallel.expected)

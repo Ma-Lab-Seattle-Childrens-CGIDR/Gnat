@@ -85,14 +85,13 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #'    list, see return for more information.
 #' @returns
 #'    If as.frame is TRUE:
-#'      a dataframe with columns for gene network name
-#'      (determined by the names of the gene_index list), value of absolute
-#'      rank conservation index, and p-value of the absolute rank conservation
-#'      index.
+#'      a dataframe with columns `gene_network` (determined by the names of the
+#'      gene_index list),  `p1.rank_conservation_index`,
+#'      `p2.rank_conservation_index`, `absolute_difference`, and `p.value`.
 #'    If as.frame is FALSE:
 #'      A list named according to the names in the gene_index argument, with
-#'      each entry being a named list, with `$value` equal to the absolute
-#'      difference in rank conservation scores between the two phenotypes, and
+#'      each entry being a named list, with `$p1.rank_conservation_index`,
+#'      `$p2.rank_conservation_index`, `$absolute_difference`, and `$p.value`
 #'      `$p.value` equal to the p-value for `$value` found with bootstrapping.
 #' @examples
 #' # example code
@@ -114,12 +113,17 @@ DIRAC.compare_phenotypes <- function(expression, phenotype1, phenotype2,
     return(res_list)
   } else{
     # Get the values
-    values.list <- sapply(res_list, function(x) x$value)
+    p1.rci_list <- sapply(res_list, function(x) x$p1.rank_conservation_index)
+    p2.rci_list <- sapply(res_list, function(x) x$p2.rank_conservation_index)
+    absolute_difference.list <- sapply(res_list,
+                                       function(x) x$absolute_difference)
     p.values.list <- sapply(res_list, function(x) x$p.value)
     gene_networks.list <- names(gene_network_list)
     res_frame <- data.frame(
       gene_network=gene_networks.list,
-      value=values.list,
+      p1.rank_conservation_index=p1.rci_list,
+      p2.rank_conservation_index=p2.rci_list,
+      absolute_difference=absolute_difference.list,
       p.value=p.values.list
     )
     return(res_frame)
@@ -691,9 +695,8 @@ dirac.compare_phenotype.shuffle <- function(i,rank_matrix, combined, p1.size,
 #'    and the remainder of combined is taken as the other sample.
 #' @param seed Integer, used to set the seed for the random number generator
 #'    used for sampling.
-#' @returns A named list, with value equal to the absolute difference in rank
-#'    conservation scores between the two phenotypes, and p.value equal to the
-#'    p-value found with bootstrapping.
+#' @returns A named list, with p1.rank_conservation_index,
+#'    p2.rank_conservation_index, absolute_difference, and p.value
 #' @examples
 #' # example code
 #' @export
@@ -708,10 +711,18 @@ dirac.compare_phenotype <- function(gene_index, expression, phenotype1,
   combined <- c(phenotype1, phenotype2)
   # Find the rank matrix
   rank_matrix <- dirac.rank_matrix(expression[gene_index,])
-  # Find the difference value for the unshuffled phenotypes
-  abs_rci_diff <-  dirac.compare_phenotype.single(expression[gene_index,],
-                                                  phenotype1,
-                                                  phenotype2)
+  # Calculate the rank conservation index for the two phenotypes
+  p1.rank_matrix <- rank_matrix[, phenotype1]
+  p2.rank_matrix <- rank_matrix[, phenotype2]
+  p1.rank_template <- dirac.rank_template(p1.rank_matrix)
+  p2.rank_template <- dirac.rank_template(p2.rank_matrix)
+  p1.rank_conservation_index <- dirac.rank_conservation_index(p1.rank_matrix,
+                                                              p1.rank_template)
+  p2.rank_conservation_index <- dirac.rank_conservation_index(p2.rank_matrix,
+                                                              p2.rank_template)
+  # Calculate the absolute difference between the two rank conservation indices
+  absolute_difference <- abs(p1.rank_conservation_index-
+                               p2.rank_conservation_index)
   # Now perform the bootstrapping to find the null distribution
   if(parallel){
     cores = if(parallel::detectCores()>cores) cores else parallel::detectCores()
@@ -757,10 +768,13 @@ dirac.compare_phenotype <- function(gene_index, expression, phenotype1,
   # Now, use the bootstrapped values to create an empirical cdf
   boot_cdf <- stats::ecdf(res)
   # Get the p-value for the value
-  p.value <- 1-boot_cdf(abs_rci_diff)
+  p.value <- 1-boot_cdf(absolute_difference)
   # Return named list with value being the difference, and p.value being
   #   the p.value calculated using the empirical cdf
-  list(value=abs_rci_diff, p.value=p.value)
+  list(p1.rank_conservation_index=p1.rank_conservation_index,
+       p2.rank_conservation_index=p2.rank_conservation_index,
+       absolute_difference=absolute_difference,
+       p.value=p.value)
 }
 
 
