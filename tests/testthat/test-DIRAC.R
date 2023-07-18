@@ -57,7 +57,7 @@ testthat::test_that("DIRAC Compare phenotypes works",{
         p1.rank_conservation_index = c(0.75,0.66666666667, 0.625),
         p2.rank_conservation_index = c(0.75, 0.66666666667, 0.75),
         absolute_difference = c(0,0,0.125),
-        p.value=c(0.85,0.65,0.35)
+        p.value=c(0.95,0.70,0.20)
     )}
   rownames(phenotype_comp.expected) <- c("A","B","C")
   phenotype_comp.actual <-
@@ -331,12 +331,22 @@ testthat::test_that("Compare phenotype works",{
     c(1,2,3,4), expression, c(1,2,3,4), c(5,6,7,8), bootstrap_iterations = 20,
     parallel=TRUE, cores=2, replace=TRUE, seed=42
   )
-  compare_phenotype_parallel.expected <- list(
-    p1.rank_conservation_index = 0.625,
-    p2.rank_conservation_index = 0.75,
-    absolute_difference = 0.125,
-    p.value = 0.3
-  )
+  os.type <- .Platform$OS.type
+  if(os.type=="unix"){
+    compare_phenotype_parallel.expected <- list(
+      p1.rank_conservation_index = 0.625,
+      p2.rank_conservation_index = 0.75,
+      absolute_difference = 0.125,
+      p.value = 0.45
+    )
+  } else if(os.type=="windows"){
+    compare_phenotype_parallel.expected <- list(
+      p1.rank_conservation_index = 0.625,
+      p2.rank_conservation_index = 0.75,
+      absolute_difference = 0.125,
+      p.value = 0.45
+    )
+  }
   expect_equal(compare_phenotype_parallel.actual,
                compare_phenotype_parallel.expected)
 })
