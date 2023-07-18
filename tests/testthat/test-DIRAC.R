@@ -344,7 +344,7 @@ testthat::test_that("Compare phenotype works",{
       p1.rank_conservation_index = 0.625,
       p2.rank_conservation_index = 0.75,
       absolute_difference = 0.125,
-      p.value = 0.45
+      p.value = 0.3
     )
   }
   expect_equal(compare_phenotype_parallel.actual,
