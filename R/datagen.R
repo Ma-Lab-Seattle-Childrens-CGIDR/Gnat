@@ -97,7 +97,7 @@ datagen.swap <- function(expression, nswaps){
 #' @examples
 datagen.noise <- function(expression, dist, ...){
   ngenes <- nrow(expression)
-  nsamples <- nrow(expression)
+  nsamples <- ncol(expression)
   noise.matrix <- matrix(dist(ngenes*nsamples,...), nrow=ngenes, ncol=nsamples)
   expression+noise.matrix
 }
