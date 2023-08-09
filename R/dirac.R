@@ -96,8 +96,8 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
 #' @examples
 #' # example code
 #' @export
-DIRAC.compare_phenotypes <- function(expression, phenotype1, phenotype2,
-                                     gene_network_list, bootstrap_iterations=1000,
+DIRAC.compare_phenotypes <- function(expression, gene_network_list,phenotype1,
+                                     phenotype2, bootstrap_iterations=1000,
                                      parallel=TRUE, cores=4, replace=TRUE,
                                      seed=NULL, as.frame=TRUE){
   # Run the dirac.commpare phenotype function for each of the gene networks

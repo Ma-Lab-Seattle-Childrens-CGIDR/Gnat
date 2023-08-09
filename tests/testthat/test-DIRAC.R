@@ -61,8 +61,8 @@ testthat::test_that("DIRAC Compare phenotypes works",{
     )}
   rownames(phenotype_comp.expected) <- c("A","B","C")
   phenotype_comp.actual <-
-    DIRAC.compare_phenotypes(expression, c(1,2,3,4), c(5,6,7,8),
-                             gene_index_list, bootstrap_iterations = 20,
+    DIRAC.compare_phenotypes(expression, gene_index_list, c(1,2,3,4),
+                             c(5,6,7,8), bootstrap_iterations = 20,
                              parallel=TRUE, cores=2, replace=TRUE, seed = 42,
                              as.frame=TRUE)
   expect_equal(phenotype_comp.actual, phenotype_comp.expected)
@@ -76,8 +76,8 @@ testthat::test_that("DIRAC Compare phenotypes works",{
   )
   rownames(phenotype_comp.serial.expected) <- c("A","B","C")
   phenotype_comp.serial.actual <-
-    DIRAC.compare_phenotypes(expression, c(1,2,3,4), c(5,6,7,8),
-                             gene_index_list, bootstrap_iterations = 20,
+    DIRAC.compare_phenotypes(expression, gene_index_list, c(1,2,3,4),
+                             c(5,6,7,8), bootstrap_iterations = 20,
                              parallel=FALSE, cores=1, replace=TRUE, seed = 42,
                              as.frame=TRUE)
   expect_equal(phenotype_comp.serial.actual, phenotype_comp.serial.expected)
