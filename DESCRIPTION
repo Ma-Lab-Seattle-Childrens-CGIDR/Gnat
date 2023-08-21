@@ -3,7 +3,7 @@ Title: Analyze rank entropy in gene expression networks
 Version: 0.0.1
 Authors@R: 
     person("Braden", "Griebel", , "bgriebel@uw.edu", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0009-0003-3617-5734"))
 Description: Functions for evaluating the rank entropy of gene networks based 
              on gene expression data. Included methods based on DIRAC, and also 
              the Kendall Rank Correlation Coefficient. 
@@ -11,6 +11,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+biocViews: TranscriptomeVariant, GeneSignaling
+Imports:
+    stats,
+    parallel,
+    SummarizedExperiment,
+    SingleCellExperiment
 Suggests: 
     testthat (>= 3.0.0),
 Config/testthat/edition: 3

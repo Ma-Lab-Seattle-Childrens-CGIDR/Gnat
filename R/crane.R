@@ -35,6 +35,8 @@
 CRANE <- function(expression, gene_network_list, phenotype1, phenotype2,
                   bootstrap_iterations=1000, parallel=TRUE, cores=4,
                   replace=TRUE, seed=NULL, as.frame=TRUE){
+  # Ensure that the gene_network_list is named
+  gene_network_list <- ensure_named(gene_network_list, prefix="gene_network_")
   # Run the crane.compare_phenotypes
   res_list <- lapply(gene_network_list, crane.compare_phenotypes,
                      expression=expression, phenotype1=phenotype1,

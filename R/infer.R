@@ -45,6 +45,8 @@ INFER <- function(expression, gene_network_list,
                   bootstrap_iterations=1000,
                   parallel=TRUE,
                   cores=4, replace=TRUE,seed=NULL, as.frame=TRUE){
+  # Ensure that the gene_network_list is named
+  gene_network_list <- ensure_named(gene_network_list, prefix="gene_network_")
   # Run the infer.compare_phenotypes
   res_list <- lapply(gene_network_list, infer.compare_phenotypes,
                      expression=expression,
