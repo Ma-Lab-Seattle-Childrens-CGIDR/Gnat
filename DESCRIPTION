@@ -15,6 +15,7 @@ biocViews: TranscriptomeVariant, GeneSignaling
 Imports:
     stats,
     parallel,
+    BiocParallel,
     SummarizedExperiment,
     SingleCellExperiment
 Suggests: 

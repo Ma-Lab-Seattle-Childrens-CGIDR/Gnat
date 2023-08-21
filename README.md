@@ -39,21 +39,23 @@ devtools::install_github("Ma-Lab-Seattle-Childrens-CGIDR/Gnat")
 
 ``` r
 library(Gnat)
-# Create some example data, with one tightly regulated phenotype, and very 
+# Create some example data, with one tightly regulated phenotype, and very
 #   loosely regulated
 # Create the tightly regulated gene network expression data
-expression.p1 <- matrix(c(1,2,3,4,5,6,7,8,
-                          1,3,2,4,5,6,8,7,
-                          2,1,3,4,6,5,7,8,
-                          1,2,3,4,5,7,6,8,
-                          1,3,2,4,5,6,7,8,
-                          3,2,1,4,5,6,7,8,
-                          1,2,3,4,6,5,7,8), ncol=7)
+expression.p1 <- matrix(c(
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 3, 2, 4, 5, 6, 8, 7,
+  2, 1, 3, 4, 6, 5, 7, 8,
+  1, 2, 3, 4, 5, 7, 6, 8,
+  1, 3, 2, 4, 5, 6, 7, 8,
+  3, 2, 1, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 6, 5, 7, 8
+), ncol = 7)
 # Use random data to simulate a very loosely regulated network
-# Note, the magnitudes of expression is very different between the two 
-#   phenotypes, but since only ranks are considered this won't affect the 
+# Note, the magnitudes of expression is very different between the two
+#   phenotypes, but since only ranks are considered this won't affect the
 #   outcome
-expression.p2 <- matrix(runif(7*8, min=1, max=500), ncol = 7)
+expression.p2 <- matrix(runif(7 * 8, min = 1, max = 500), ncol = 7)
 # Combine the two phenotypes into one matrix
 expression <- cbind(expression.p1, expression.p2)
 # Store the indices for both phenotypes
@@ -62,62 +64,68 @@ phenotype2 <- 8:14
 # Create a list to represent several gene networks
 #   Note that overlaps between the networks are allowed
 gene_network_list <- list(
-  A=c(1,3,5,6),
-  B=c(2,3,7,8),
-  C=c(4,5,6)
+  A = c(1, 3, 5, 6),
+  B = c(2, 3, 7, 8),
+  C = c(4, 5, 6)
 )
 # Run the analysis with different methods
-DIRAC.results <- DIRAC.compare_phenotypes(expression, phenotype1, phenotype2,
-                                          gene_network_list, 
-                                          bootstrap_iterations = 1000,
-                                          parallel = FALSE, cores = 1, 
-                                          replace = TRUE, seed = 42, 
-                                          as.frame = TRUE)
+DIRAC.results <- DIRAC.compare_phenotypes(
+  expression=expression, phenotype1=phenotype1, phenotype2=phenotype2,
+  gene_network_list=gene_network_list, bootstrap_iterations = 1000,
+  parallel = FALSE, cores = 1,  replace = TRUE, seed = 42, as.frame = TRUE
+)
 INFER.results <- INFER(expression, gene_network_list, phenotype1, phenotype2,
-                       bootstrap_iterations = 1000, parallel = FALSE,
-                       cores = 1, replace = TRUE, seed = 42, as.frame = TRUE)
+  bootstrap_iterations = 1000, parallel = FALSE,
+  cores = 1, replace = TRUE, seed = 42, as.frame = TRUE
+)
 CRANE.results <- CRANE(expression, gene_network_list, phenotype1, phenotype2,
-                       bootstrap_iterations = 1000, parallel = FALSE,
-                       cores = 1, replace = TRUE, seed = 42, as.frame = TRUE)
-RACE.results <- RACE(expression, gene_network_list, phenotype1, phenotype2, 
-                     bootstrap_iterations = 1000, parallel = FALSE,
-                     cores = 1, replace = TRUE, seed = 42, as.frame = TRUE)
+  bootstrap_iterations = 1000, parallel = FALSE,
+  cores = 1, replace = TRUE, seed = 42, as.frame = TRUE
+)
+RACE.results <- RACE(expression, gene_network_list, phenotype1, phenotype2,
+  bootstrap_iterations = 1000, parallel = FALSE,
+  cores = 1, replace = TRUE, seed = 42, as.frame = TRUE
+)
 print("DIRAC results")
 #> [1] "DIRAC results"
 print(DIRAC.results)
-#>   gene_network      value p.value
-#> A            A 0.21428571   0.016
-#> B            B 0.07142857   0.402
-#> C            C 0.00000000   0.797
+#>   gene_network p1.rank_conservation_index p2.rank_conservation_index
+#> A            A                  0.9285714                  0.6904762
+#> B            B                  0.9047619                  0.6428571
+#> C            C                  0.9047619                  0.6666667
+#>   absolute_difference p.value
+#> A           0.2380952   0.001
+#> B           0.2619048   0.018
+#> C           0.2380952   0.031
 print("INFER results")
 #> [1] "INFER results"
 print(INFER.results)
 #>   gene_network p1.rank_entropy p2.rank_entropy absolute_difference p.value
-#> A            A       0.7273967        1.454701           0.7273046   0.025
-#> B            B       0.7884505        1.529696           0.7412460   0.041
-#> C            C       0.5754137        1.135002           0.5595881   0.057
+#> A            A       0.7273967        1.753434           1.0260377   0.004
+#> B            B       0.7884505        1.672554           0.8841031   0.018
+#> C            C       0.5754137        1.378783           0.8033698   0.039
 print("CRANE results")
 #> [1] "CRANE results"
 print(CRANE.results)
 #>   gene_network p1.mean_centroid_distance p2.mean_centroid_distance
-#> A            A                 0.7350120                  1.722550
-#> B            B                 0.8111936                  1.629680
-#> C            C                 0.5772300                  1.210507
+#> A            A                 0.7350120                  2.042387
+#> B            B                 0.8111936                  2.091460
+#> C            C                 0.5772300                  1.255934
 #>   absolute_difference p.value
-#> A           0.9875384   0.018
-#> B           0.8184868   0.052
-#> C           0.6332766   0.022
+#> A           1.3073746   0.000
+#> B           1.2802666   0.014
+#> C           0.6787035   0.046
 print("RACE results")
 #> [1] "RACE results"
 print(RACE.results)
 #>   gene_network p1.mean_rank_correlation p2.mean_rank_correlation
-#> A            A                0.7460317               0.20634921
-#> B            B                0.7142857               0.26984127
-#> C            C                0.6825397               0.04761905
+#> A            A                0.7460317               0.04761905
+#> B            B                0.7142857              -0.04761905
+#> C            C                0.6825397              -0.01587302
 #>   absolute_difference p.value
-#> A           0.5396825   0.017
-#> B           0.4444444   0.051
-#> C           0.6349206   0.011
+#> A           0.6984127   0.002
+#> B           0.7619048   0.012
+#> C           0.6984127   0.038
 ```
 
 # Method Details
