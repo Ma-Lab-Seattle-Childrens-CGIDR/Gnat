@@ -7,7 +7,7 @@
 #' @param phenotype1,phenotype2 Index vectors, representing the indices of the
 #'    phenotypes in the expression matrix
 #' @param geneNetworkList List of index vectors, each vector representing the
-#'    indices of a different gene network,
+#'    indices of a different gene networks
 #' @param rankFun Function for creating a rank matrix, should take a matrix of
 #'    dim (gene, sample) as input, and return a rank matrix, with samples as the
 #'    columns.
