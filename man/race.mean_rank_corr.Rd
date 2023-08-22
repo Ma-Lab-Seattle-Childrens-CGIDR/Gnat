@@ -18,7 +18,7 @@ Find the mean Kendall correlation between all samples
 }
 \examples{
 # Create example matrix
-mat <- matrix(c(1,2,3,4,2,3,1,4,4,1,2,3,1,4,2,3), ncol=4)
+mat <- matrix(c(1, 2, 3, 4, 2, 3, 1, 4, 4, 1, 2, 3, 1, 4, 2, 3), ncol = 4)
 # Print the result
 print(race.mean_rank_corr(mat))
 }

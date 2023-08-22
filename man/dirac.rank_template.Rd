@@ -19,6 +19,6 @@ Numeric vector, rank template
 Strict inequality is used for finding the rank template.
 }
 \examples{
-dirac.rank_template(matrix(1:16,ncol=4, nrow=4))
+dirac.rank_template(matrix(1:16, ncol = 4, nrow = 4))
 
 }

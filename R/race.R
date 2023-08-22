@@ -42,40 +42,91 @@ RACE <- function(expression, gene_network_list,
                  phenotype1, phenotype2, bootstrap_iterations = 1000,
                  parallel = TRUE, cores = 4, replace = TRUE, seed = NULL,
                  as.frame = TRUE) {
-  # Ensure that the gene_network_list is named
-  gene_network_list <- ensure_named(gene_network_list, prefix = "gene_network_")
-  # Run race.compare_phenotypes for each of the gene networks in the list
-  res_list <- lapply(gene_network_list, race.compare_phenotypes,
-    expression = expression,
-    phenotype1 = phenotype1,
-    phenotype2 = phenotype2,
-    bootstrap_iterations = bootstrap_iterations,
-    parallel = parallel, cores = cores, replace = replace,
-    seed = seed
-  )
-  if (!as.frame) {
-    names(res_list) <- names(gene_network_list)
-    return(res_list)
-  } else {
-    p1.mean_rank_correlation.list <- sapply(
-      res_list, function(x) x$p1.mean_rank_correlation
+    # Ensure that the gene_network_list is named
+    gene_network_list <- ensure_named(gene_network_list, prefix = "gene_network_")
+    # Run race.compare_phenotypes for each of the gene networks in the list
+    res_list <- lapply(gene_network_list, race.compare_phenotypes,
+        expression = expression,
+        phenotype1 = phenotype1,
+        phenotype2 = phenotype2,
+        bootstrap_iterations = bootstrap_iterations,
+        parallel = parallel, cores = cores, replace = replace,
+        seed = seed
     )
-    p2.mean_rank_correlation.list <- sapply(
-      res_list, function(x) x$p2.mean_rank_correlation
-    )
-    abs_diff_list <- sapply(res_list, function(x) x$absolute_difference)
-    p.value.list <- sapply(res_list, function(x) x$p.value)
-    gene_network_names <- names(gene_network_list)
-    res_frame <- data.frame(
-      gene_network = gene_network_names,
-      p1.mean_rank_correlation = p1.mean_rank_correlation.list,
-      p2.mean_rank_correlation = p2.mean_rank_correlation.list,
-      absolute_difference = abs_diff_list,
-      p.value = p.value.list
-    )
-    return(res_frame)
-  }
+    if (!as.frame) {
+        names(res_list) <- names(gene_network_list)
+        return(res_list)
+    } else {
+        p1.mean_rank_correlation.list <- sapply(
+            res_list, function(x) x$p1.mean_rank_correlation
+        )
+        p2.mean_rank_correlation.list <- sapply(
+            res_list, function(x) x$p2.mean_rank_correlation
+        )
+        abs_diff_list <- sapply(res_list, function(x) x$absolute_difference)
+        p.value.list <- sapply(res_list, function(x) x$p.value)
+        gene_network_names <- names(gene_network_list)
+        res_frame <- data.frame(
+            gene_network = gene_network_names,
+            p1.mean_rank_correlation = p1.mean_rank_correlation.list,
+            p2.mean_rank_correlation = p2.mean_rank_correlation.list,
+            absolute_difference = abs_diff_list,
+            p.value = p.value.list
+        )
+        return(res_frame)
+    }
 }
+
+
+
+# Rank Function -----------------------------------------------------------
+#' Rank function for the RACE method, simply the identity function
+#'
+#' @param filteredExpression Filtered expression, where each row is a gene
+#'      within the gene network, and each column is a sample
+#'
+#' @return Numeric matrix, identical to input
+#'
+#' @details
+#' This function just returns the same matrix that it is provided, it is used
+#' for providing compatability with the other methods
+#'
+#'
+#' @export
+#'
+#' @examples
+#' testMat <- matrix(runif(20), ncol=4, nrow=5)
+#' print(raceRankFunction(testMat))
+#' print(raceRankFunction(testMat, margin=1))
+raceRankFunction <- function(filteredExpression){
+    filteredExpression
+}
+
+
+# Score Function ----------------------------------------------------------
+
+#' Function
+#'
+#' @param rankMatrix Numeric matrix, for this method this is the same as the
+#'      expression matrix
+#'
+#' @return Numeric score, value representing the mean Kendall Tau between all
+#'
+#'
+#' @export
+#'
+#' @examples
+raceScoreFunction <- function(rankMatrix){
+    correlation <- stats::cor(rankMatrix, method="kendall")
+    mean(correlation[lower.tri(correlation)])
+}
+
+
+
+# Sample Score ------------------------------------------------------------
+
+
+
 
 
 # Helper Functions --------------------------------------------------------
@@ -94,8 +145,8 @@ RACE <- function(expression, gene_network_list,
 #' # Print the result
 #' print(race.mean_rank_corr(mat))
 race.mean_rank_corr <- function(expression.filtered) {
-  correlation <- stats::cor(expression.filtered, method = "kendall")
-  mean(correlation[lower.tri(correlation)])
+    correlation <- stats::cor(expression.filtered, method = "kendall")
+    mean(correlation[lower.tri(correlation)])
 }
 
 
@@ -117,15 +168,15 @@ race.mean_rank_corr <- function(expression.filtered) {
 #' @examples
 race.compare_phenotypes.single <- function(expression.gene_network, phenotype1,
                                            phenotype2) {
-  # get the expression matrices for each phenotype
-  p1.expression <- expression.gene_network[, phenotype1]
-  p2.expression <- expression.gene_network[, phenotype2]
-  # Get the rank correlation means for each phenotype
-  p1.rank_corr_mean <- race.mean_rank_corr(p1.expression)
-  p2.rank_corr_mean <- race.mean_rank_corr(p2.expression)
-  # Return the absolute value of the differences between the mean rank
-  #   correlations
-  abs(p1.rank_corr_mean - p2.rank_corr_mean)
+    # get the expression matrices for each phenotype
+    p1.expression <- expression.gene_network[, phenotype1]
+    p2.expression <- expression.gene_network[, phenotype2]
+    # Get the rank correlation means for each phenotype
+    p1.rank_corr_mean <- race.mean_rank_corr(p1.expression)
+    p2.rank_corr_mean <- race.mean_rank_corr(p2.expression)
+    # Return the absolute value of the differences between the mean rank
+    #   correlations
+    abs(p1.rank_corr_mean - p2.rank_corr_mean)
 }
 
 
@@ -151,23 +202,23 @@ race.compare_phenotypes.single <- function(expression.gene_network, phenotype1,
 race.compare_phenotypes.shuffle <- function(i, expression.gene_network,
                                             combined, p1.size, p2.size,
                                             replace = TRUE) {
-  if (replace) {
-    # Sample combined for p1.indices
-    p1.idx <- sample(combined, p1.size, replace = replace)
-    # Sample combined for the p2.indices
-    p2.idx <- sample(combined, p2.size, replace = replace)
-  } else {
-    # Sample for p1 indices
-    p1.idx <- sample(combined, p1.size, replace = replace)
-    # Use the remaining indices for p2.idx
-    p2.idx <- setdiff(combined, p1.idx)
-  }
-  # Compute the absolute difference in mean Kendall Correlation between the
-  # shuffled phenotypes
-  race.compare_phenotypes.single(
-    expression.gene_network = expression.gene_network, phenotype1 = p1.idx,
-    phenotype2 = p2.idx
-  )
+    if (replace) {
+        # Sample combined for p1.indices
+        p1.idx <- sample(combined, p1.size, replace = replace)
+        # Sample combined for the p2.indices
+        p2.idx <- sample(combined, p2.size, replace = replace)
+    } else {
+        # Sample for p1 indices
+        p1.idx <- sample(combined, p1.size, replace = replace)
+        # Use the remaining indices for p2.idx
+        p2.idx <- setdiff(combined, p1.idx)
+    }
+    # Compute the absolute difference in mean Kendall Correlation between the
+    # shuffled phenotypes
+    race.compare_phenotypes.single(
+        expression.gene_network = expression.gene_network, phenotype1 = p1.idx,
+        phenotype2 = p2.idx
+    )
 }
 
 
@@ -204,82 +255,82 @@ race.compare_phenotypes <- function(gene_network, expression,
                                     phenotype1, phenotype2,
                                     bootstrap_iterations = 1000, parallel = TRUE,
                                     cores = 4, replace = TRUE, seed = NULL) {
-  # Get the size of each of the phenotypes
-  p1.size <- length(phenotype1)
-  p2.size <- length(phenotype2)
-  # Get the combined indices of the two phenotypes
-  combined <- c(phenotype1, phenotype2)
-  # Find the mean kendall rank correlation coefficient for the two phenotypes
-  p1.mean_rc <- race.mean_rank_corr(
-    expression.filtered = expression[gene_network, phenotype1]
-  )
-  p2.mean_rc <- race.mean_rank_corr(
-    expression.filtered = expression[gene_network, phenotype2]
-  )
-  # Find the absolute difference between the two phenotypes
-  abs_diff_mean_rc <- abs(p1.mean_rc - p2.mean_rc)
-  # Perform the bootstrapping for the null distribution
-  if (parallel) {
-    cores <- if (parallel::detectCores() > cores) cores else parallel::detectCores()
-  }
-  os_type <- .Platform$OS.type
-  if (parallel) {
-    if (os_type == "unix") {
-      # Set seed
-      set.seed(seed, "L'Ecuyer")
-      # Use multicore apply
-      res <- unlist(parallel::mclapply(1:bootstrap_iterations,
-        race.compare_phenotypes.shuffle,
-        expression.gene_network =
-          expression[gene_network, ],
-        combined = combined, p1.size = p1.size,
-        p2.size = p2.size, replace = replace,
-        mc.cores = cores
-      ))
-    } else if (os_type == "windows") {
-      # make the cluster
-      cl <- parallel::makeCluster(cores)
-      # Set the RNG stream seed
-      parallel::clusterSetRNGStream(cl, seed)
-      # Export the needed functions
-      parallel::clusterExport(cl, list(
-        "race.mean_rank_corr",
-        "race.compare_phenotypes.single",
-        "race.compare_phenotypes.shuffle"
-      ))
-      res <- tryCatch(expr = {
-        unlist(parallel::parLapply(cl, 1:bootstrap_iterations,
-          race.compare_phenotypes.shuffle,
-          expression.gene_network =
-            expression[gene_network, ],
-          combined = combined, p1.size = p1.size,
-          p2.size = p2.size, replace = replace
-        ))
-      }, finally = {
-        parallel::stopCluster(cl)
-      })
-    } else {
-      stop("Unsupported OS for parallel operation")
+    # Get the size of each of the phenotypes
+    p1.size <- length(phenotype1)
+    p2.size <- length(phenotype2)
+    # Get the combined indices of the two phenotypes
+    combined <- c(phenotype1, phenotype2)
+    # Find the mean kendall rank correlation coefficient for the two phenotypes
+    p1.mean_rc <- race.mean_rank_corr(
+        expression.filtered = expression[gene_network, phenotype1]
+    )
+    p2.mean_rc <- race.mean_rank_corr(
+        expression.filtered = expression[gene_network, phenotype2]
+    )
+    # Find the absolute difference between the two phenotypes
+    abs_diff_mean_rc <- abs(p1.mean_rc - p2.mean_rc)
+    # Perform the bootstrapping for the null distribution
+    if (parallel) {
+        cores <- if (parallel::detectCores() > cores) cores else parallel::detectCores()
     }
-  } else {
-    set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
-    res <- unlist(lapply(1:bootstrap_iterations,
-      race.compare_phenotypes.shuffle,
-      expression.gene_network =
-        expression[gene_network, ],
-      combined = combined, p1.size = p1.size,
-      p2.size = p2.size, replace = replace
-    ))
-  }
-  # Now create the ecdf
-  boot_cdf <- stats::ecdf(res)
-  # Get the p-value for the absolute rank correlation difference
-  p.value <- 1 - boot_cdf(abs_diff_mean_rc)
-  # Return named list with the results
-  list(
-    p1.mean_rank_correlation = p1.mean_rc,
-    p2.mean_rank_correlation = p2.mean_rc,
-    absolute_difference = abs_diff_mean_rc,
-    p.value = p.value
-  )
+    os_type <- .Platform$OS.type
+    if (parallel) {
+        if (os_type == "unix") {
+            # Set seed
+            set.seed(seed, "L'Ecuyer")
+            # Use multicore apply
+            res <- unlist(parallel::mclapply(1:bootstrap_iterations,
+                race.compare_phenotypes.shuffle,
+                expression.gene_network =
+                    expression[gene_network, ],
+                combined = combined, p1.size = p1.size,
+                p2.size = p2.size, replace = replace,
+                mc.cores = cores
+            ))
+        } else if (os_type == "windows") {
+            # make the cluster
+            cl <- parallel::makeCluster(cores)
+            # Set the RNG stream seed
+            parallel::clusterSetRNGStream(cl, seed)
+            # Export the needed functions
+            parallel::clusterExport(cl, list(
+                "race.mean_rank_corr",
+                "race.compare_phenotypes.single",
+                "race.compare_phenotypes.shuffle"
+            ))
+            res <- tryCatch(expr = {
+                unlist(parallel::parLapply(cl, 1:bootstrap_iterations,
+                    race.compare_phenotypes.shuffle,
+                    expression.gene_network =
+                        expression[gene_network, ],
+                    combined = combined, p1.size = p1.size,
+                    p2.size = p2.size, replace = replace
+                ))
+            }, finally = {
+                parallel::stopCluster(cl)
+            })
+        } else {
+            stop("Unsupported OS for parallel operation")
+        }
+    } else {
+        set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
+        res <- unlist(lapply(1:bootstrap_iterations,
+            race.compare_phenotypes.shuffle,
+            expression.gene_network =
+                expression[gene_network, ],
+            combined = combined, p1.size = p1.size,
+            p2.size = p2.size, replace = replace
+        ))
+    }
+    # Now create the ecdf
+    boot_cdf <- stats::ecdf(res)
+    # Get the p-value for the absolute rank correlation difference
+    p.value <- 1 - boot_cdf(abs_diff_mean_rc)
+    # Return named list with the results
+    list(
+        p1.mean_rank_correlation = p1.mean_rc,
+        p2.mean_rank_correlation = p2.mean_rc,
+        absolute_difference = abs_diff_mean_rc,
+        p.value = p.value
+    )
 }

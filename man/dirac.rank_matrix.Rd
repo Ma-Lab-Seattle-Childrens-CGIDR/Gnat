@@ -17,6 +17,6 @@ matrix whose columns represent the rank_vector for each sample
 \code{dirac.rank_matrix} creates a DIRAC ranking matrix from expression data.
 }
 \examples{
-dirac.rank_matrix(matrix(1:16, ncol=4, nrow=4))
+dirac.rank_matrix(matrix(1:16, ncol = 4, nrow = 4))
 
 }

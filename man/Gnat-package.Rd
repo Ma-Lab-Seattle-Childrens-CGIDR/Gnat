@@ -9,7 +9,7 @@
 Functions for evaluating the rank entropy of gene networks based on gene expression data. Included methods based on DIRAC, and also the Kendall Rank Correlation Coefficient.
 }
 \author{
-\strong{Maintainer}: Braden Griebel \email{bgriebel@uw.edu} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Braden Griebel \email{bgriebel@uw.edu} (\href{https://orcid.org/0009-0003-3617-5734}{ORCID})
 
 }
 \keyword{internal}

@@ -32,29 +32,29 @@
 #' @examples
 datagen.generate <- function(ngenes.ordered, ngenes.total, nsamples.ordered,
                              nsamples.total, dist, reorder.genes = TRUE, ...) {
-  expression.matrix <- datagen.unordered.matrix(
-    ngenes.total,
-    nsamples.total,
-    dist, ...
-  )
-  ordered.expression <- datagen.ordered.matrix(
-    ngenes.ordered, nsamples.ordered,
-    dist, ...
-  )
-  ordered.genes <- sample(ngenes.total, ngenes.ordered, replace = FALSE)
-  ordered.samples <- sample(nsamples.total, nsamples.ordered, replace = FALSE)
-  if (!reorder.genes) {
-    ordered.genes <- sort(ordered.genes)
-  }
-  for (i in 1:ngenes.ordered) {
-    expression.matrix[ordered.genes[i], ordered.samples] <-
-      ordered.expression[i, ]
-  }
-  list(
-    expression = expression.matrix,
-    ordered.genes = ordered.genes,
-    ordered.samples = sort(ordered.samples)
-  )
+    expression.matrix <- datagen.unordered.matrix(
+        ngenes.total,
+        nsamples.total,
+        dist, ...
+    )
+    ordered.expression <- datagen.ordered.matrix(
+        ngenes.ordered, nsamples.ordered,
+        dist, ...
+    )
+    ordered.genes <- sample(ngenes.total, ngenes.ordered, replace = FALSE)
+    ordered.samples <- sample(nsamples.total, nsamples.ordered, replace = FALSE)
+    if (!reorder.genes) {
+        ordered.genes <- sort(ordered.genes)
+    }
+    for (i in 1:ngenes.ordered) {
+        expression.matrix[ordered.genes[i], ordered.samples] <-
+            ordered.expression[i, ]
+    }
+    list(
+        expression = expression.matrix,
+        ordered.genes = ordered.genes,
+        ordered.samples = sort(ordered.samples)
+    )
 }
 
 
@@ -74,16 +74,16 @@ datagen.generate <- function(ngenes.ordered, ngenes.total, nsamples.ordered,
 #'
 #' @examples
 datagen.swap <- function(expression, nswaps) {
-  nsamples <- ncol(expression)
-  ngenes <- nrow(expression)
-  sample_list <- sample(nsamples, size = nswaps, replace = TRUE)
-  for (i in 1:nswaps) {
-    genes <- sample(ngenes, size = 2, replace = FALSE)
-    temp <- expression[genes[1], sample_list[i]]
-    expression[genes[1], sample_list[i]] <- expression[genes[2], sample_list[i]]
-    expression[genes[2], sample_list[i]] <- temp
-  }
-  expression
+    nsamples <- ncol(expression)
+    ngenes <- nrow(expression)
+    sample_list <- sample(nsamples, size = nswaps, replace = TRUE)
+    for (i in 1:nswaps) {
+        genes <- sample(ngenes, size = 2, replace = FALSE)
+        temp <- expression[genes[1], sample_list[i]]
+        expression[genes[1], sample_list[i]] <- expression[genes[2], sample_list[i]]
+        expression[genes[2], sample_list[i]] <- temp
+    }
+    expression
 }
 
 #' Adds noise from a distribution to the expression data
@@ -100,10 +100,10 @@ datagen.swap <- function(expression, nswaps) {
 #'
 #' @examples
 datagen.noise <- function(expression, dist, ...) {
-  ngenes <- nrow(expression)
-  nsamples <- ncol(expression)
-  noise.matrix <- matrix(dist(ngenes * nsamples, ...), nrow = ngenes, ncol = nsamples)
-  expression + noise.matrix
+    ngenes <- nrow(expression)
+    nsamples <- ncol(expression)
+    noise.matrix <- matrix(dist(ngenes * nsamples, ...), nrow = ngenes, ncol = nsamples)
+    expression + noise.matrix
 }
 
 #' Dropout a proportion of expression data
@@ -121,14 +121,14 @@ datagen.noise <- function(expression, dist, ...) {
 #'
 #' @examples
 datagen.dropout <- function(expression, dropout.rate) {
-  ngenes <- nrow(expression)
-  nsamples <- ncol(expression)
-  nvalues.drop <- floor(dropout.rate * (ngenes * nsamples))
-  drop.index <- sample(ngenes * nsamples, size = nvalues.drop, replace = FALSE)
-  drop.vector <- logical(ngenes * nsamples)
-  drop.vector[drop.index] <- TRUE
-  expression[drop.vector] <- 0
-  expression
+    ngenes <- nrow(expression)
+    nsamples <- ncol(expression)
+    nvalues.drop <- floor(dropout.rate * (ngenes * nsamples))
+    drop.index <- sample(ngenes * nsamples, size = nvalues.drop, replace = FALSE)
+    drop.vector <- logical(ngenes * nsamples)
+    drop.vector[drop.index] <- TRUE
+    expression[drop.vector] <- 0
+    expression
 }
 
 
@@ -147,8 +147,8 @@ datagen.dropout <- function(expression, dropout.rate) {
 #'
 #' @examples
 datagen.ordered.vector <- function(ngenes, dist, ...) {
-  expression.unordered <- dist(ngenes, ...)
-  sort(expression.unordered, decreasing = FALSE)
+    expression.unordered <- dist(ngenes, ...)
+    sort(expression.unordered, decreasing = FALSE)
 }
 
 
@@ -168,13 +168,13 @@ datagen.ordered.vector <- function(ngenes, dist, ...) {
 #'
 #' @examples
 datagen.ordered.matrix <- function(ngenes, nsamples, dist, ...) {
-  # Create an empty expression matrix
-  expression.matrix <- matrix(0, nrow = ngenes, ncol = nsamples)
-  # Generate the expression for each sample of the ordered phenotype
-  for (i in 1:nsamples) {
-    expression.matrix[, i] <- datagen.ordered.vector(ngenes, dist, ...)
-  }
-  expression.matrix
+    # Create an empty expression matrix
+    expression.matrix <- matrix(0, nrow = ngenes, ncol = nsamples)
+    # Generate the expression for each sample of the ordered phenotype
+    for (i in 1:nsamples) {
+        expression.matrix[, i] <- datagen.ordered.vector(ngenes, dist, ...)
+    }
+    expression.matrix
 }
 
 
@@ -191,7 +191,7 @@ datagen.ordered.matrix <- function(ngenes, nsamples, dist, ...) {
 #'
 #' @examples
 datagen.unordered.vector <- function(ngenes, dist, ...) {
-  dist(ngenes, ...)
+    dist(ngenes, ...)
 }
 
 #' Generate unordered expression matrix from a provided distribution function
@@ -209,11 +209,11 @@ datagen.unordered.vector <- function(ngenes, dist, ...) {
 #'
 #' @examples
 datagen.unordered.matrix <- function(ngenes, nsamples, dist, ...) {
-  # Create an empty expression matrix
-  expression.matrix <- matrix(0, nrow = ngenes, ncol = nsamples)
-  # Generate the expression for each sample of the ordered phenotype
-  for (i in 1:nsamples) {
-    expression.matrix[, i] <- datagen.unordered.vector(ngenes, dist, ...)
-  }
-  expression.matrix
+    # Create an empty expression matrix
+    expression.matrix <- matrix(0, nrow = ngenes, ncol = nsamples)
+    # Generate the expression for each sample of the ordered phenotype
+    for (i in 1:nsamples) {
+        expression.matrix[, i] <- datagen.unordered.vector(ngenes, dist, ...)
+    }
+    expression.matrix
 }

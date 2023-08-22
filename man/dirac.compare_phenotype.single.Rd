@@ -22,5 +22,5 @@ two phenotypes for a given gene network (implied by rank_matrix)
 rank conservation index for a gene network between two phenotypes.
 }
 \examples{
-#example code
+# example code
 }

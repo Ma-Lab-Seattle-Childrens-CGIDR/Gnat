@@ -17,8 +17,8 @@ Float, representing the entropy of the vector
 \code{entropy.vector} finds the information entropy of a vector
 }
 \examples{
-  # Create an example vector
-  example_vector <- c(1,2,3,2,1,2,3,4,5,6,6,7,1)
-  # Print the entropy of the vector
-  print(entropy.vector(example_vector))
+# Create an example vector
+example_vector <- c(1, 2, 3, 2, 1, 2, 3, 4, 5, 6, 6, 7, 1)
+# Print the entropy of the vector
+print(entropy.vector(example_vector))
 }

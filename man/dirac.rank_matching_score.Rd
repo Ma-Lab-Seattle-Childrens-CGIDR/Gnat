@@ -20,5 +20,5 @@ Float, representing the rank matching score
 vector, and a rank template.
 }
 \examples{
- dirac.rank_matching_score(c(1,0,0,1,0), c(0,1,0,1,0))
+dirac.rank_matching_score(c(1, 0, 0, 1, 0), c(0, 1, 0, 1, 0))
 }

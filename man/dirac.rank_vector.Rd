@@ -24,6 +24,6 @@ Numeric rank vector
 \code{dirac.rank_vector} creates a DIRAC ranking vector from expression data.
 }
 \examples{
-dirac.rank_vector(c(4,2,1,3))
-dirac.rank_vector(c(4,2,1,3),4)
+dirac.rank_vector(c(4, 2, 1, 3))
+dirac.rank_vector(c(4, 2, 1, 3), 4)
 }

@@ -26,7 +26,9 @@ phenotype is subtracted from the score against the rank template for the
 first phenotype.
 }
 \examples{
-expression=matrix(1:16, ncol=4, nrow=4)
-dirac.rank_difference_score(expression, phenotype1=c(1,4), phenotype2=
- c(2,3), gene_index=c(1,2,4))
+expression <- matrix(1:16, ncol = 4, nrow = 4)
+dirac.rank_difference_score(expression,
+    phenotype1 = c(1, 4), phenotype2 =
+        c(2, 3), gene_index = c(1, 2, 4)
+)
 }

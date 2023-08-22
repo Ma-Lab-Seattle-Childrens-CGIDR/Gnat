@@ -42,13 +42,13 @@ DIRAC.compare_network_classification <- function(expression, phenotype1,
                                                  phenotype2, gene_network_list,
                                                  parallel = TRUE, cores = 4,
                                                  as.frame = FALSE) {
-  # Wrapper around dirac.classification_rate.compare
-  dirac.classification_rate.compare(
-    expression, phenotype1,
-    phenotype2, gene_network_list,
-    parallel, cores,
-    as.frame
-  )
+    # Wrapper around dirac.classification_rate.compare
+    dirac.classification_rate.compare(
+        expression, phenotype1,
+        phenotype2, gene_network_list,
+        parallel, cores,
+        as.frame
+    )
 }
 
 #' Compare two phenotypes using the difference in rank conservation indices
@@ -101,39 +101,39 @@ DIRAC.compare_phenotypes <- function(expression, gene_network_list, phenotype1,
                                      phenotype2, bootstrap_iterations = 1000,
                                      parallel = TRUE, cores = 4, replace = TRUE,
                                      seed = NULL, as.frame = TRUE) {
-  # Ensure that the gene_network_list is named
-  gene_network_list <- ensure_named(gene_network_list, prefix = "gene_network_")
-  # Run the dirac.commpare phenotype function for each of the gene networks
-  res_list <- lapply(gene_network_list, dirac.compare_phenotype,
-    expression = expression,
-    phenotype1 = phenotype1,
-    phenotype2 = phenotype2,
-    bootstrap_iterations = bootstrap_iterations,
-    parallel = parallel, cores = cores, replace = replace,
-    seed = seed
-  )
-  if (!as.frame) {
-    names(res_list) <- names(gene_network_list)
-    return(res_list)
-  } else {
-    # Get the values
-    p1.rci_list <- sapply(res_list, function(x) x$p1.rank_conservation_index)
-    p2.rci_list <- sapply(res_list, function(x) x$p2.rank_conservation_index)
-    absolute_difference.list <- sapply(
-      res_list,
-      function(x) x$absolute_difference
+    # Ensure that the gene_network_list is named
+    gene_network_list <- ensure_named(gene_network_list, prefix = "gene_network_")
+    # Run the dirac.commpare phenotype function for each of the gene networks
+    res_list <- lapply(gene_network_list, dirac.compare_phenotype,
+        expression = expression,
+        phenotype1 = phenotype1,
+        phenotype2 = phenotype2,
+        bootstrap_iterations = bootstrap_iterations,
+        parallel = parallel, cores = cores, replace = replace,
+        seed = seed
     )
-    p.values.list <- sapply(res_list, function(x) x$p.value)
-    gene_networks.list <- names(gene_network_list)
-    res_frame <- data.frame(
-      gene_network = gene_networks.list,
-      p1.rank_conservation_index = p1.rci_list,
-      p2.rank_conservation_index = p2.rci_list,
-      absolute_difference = absolute_difference.list,
-      p.value = p.values.list
-    )
-    return(res_frame)
-  }
+    if (!as.frame) {
+        names(res_list) <- names(gene_network_list)
+        return(res_list)
+    } else {
+        # Get the values
+        p1.rci_list <- sapply(res_list, function(x) x$p1.rank_conservation_index)
+        p2.rci_list <- sapply(res_list, function(x) x$p2.rank_conservation_index)
+        absolute_difference.list <- sapply(
+            res_list,
+            function(x) x$absolute_difference
+        )
+        p.values.list <- sapply(res_list, function(x) x$p.value)
+        gene_networks.list <- names(gene_network_list)
+        res_frame <- data.frame(
+            gene_network = gene_networks.list,
+            p1.rank_conservation_index = p1.rci_list,
+            p2.rank_conservation_index = p2.rci_list,
+            absolute_difference = absolute_difference.list,
+            p.value = p.values.list
+        )
+        return(res_frame)
+    }
 }
 
 #' Creates a phenotype classifier based on DIRAC
@@ -160,7 +160,8 @@ DIRAC.compare_phenotypes <- function(expression, gene_network_list, phenotype1,
 #'      predicted phenotype is phenotype2
 #'    Any other value will lead the function to just return the rank matching
 #'      difference
-#' @param names optional Character vector with the desired names for the phenotypes,
+#' @param names optional Character vector with the desired names for the
+#'      phenotypes
 #'
 #' @returns A function which takes as an argument a gene expression numeric
 #'    matrix with genes as the rows and samples as the columns, and returns
@@ -172,82 +173,177 @@ DIRAC.compare_phenotypes <- function(expression, gene_network_list, phenotype1,
 DIRAC.classifier <- function(expression, phenotype1, phenotype2, gene_index,
                              return = "is phenotype1",
                              names = c("phenotype1", "phenotype2")) {
-  # get the rank matrices for the expression matrix
-  p1.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype1])
-  p2.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype2])
-  # Get the rank templates for each of the phenotypes
-  p1.rank_template <- dirac.rank_template(p1.rank_matrix)
-  p2.rank_template <- dirac.rank_template(p2.rank_matrix)
-  # Create an intermediate function which returns a vector of the rank
-  #   matching score differences from an expression matrix
-  rank_matching.diff <- function(expression) {
-    # Get the rank matrix
-    rank_matrix <- dirac.rank_matrix(expression[gene_index, ])
-    # Get the p1 matching score
-    p1.matching_score <- dirac.rank_matching_score.vector(
-      rank_matrix,
-      p1.rank_template
-    )
-    p2.matching_score <- dirac.rank_matching_score.vector(
-      rank_matrix,
-      p2.rank_template
-    )
-    # Return the difference between the two
-    p1.matching_score - p2.matching_score
-  }
-  # Based on desired return type, define a function
-  if (return == "name") {
-    if (is.null(names)) {
-      names <- c("phenotype1", "phenotype2")
+    # get the rank matrices for the expression matrix
+    p1.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype1])
+    p2.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype2])
+    # Get the rank templates for each of the phenotypes
+    p1.rank_template <- dirac.rank_template(p1.rank_matrix)
+    p2.rank_template <- dirac.rank_template(p2.rank_matrix)
+    # Create an intermediate function which returns a vector of the rank
+    #   matching score differences from an expression matrix
+    rank_matching.diff <- function(expression) {
+        # Get the rank matrix
+        rank_matrix <- dirac.rank_matrix(expression[gene_index, ])
+        # Get the p1 matching score
+        p1.matching_score <- dirac.rank_matching_score.vector(
+            rank_matrix,
+            p1.rank_template
+        )
+        p2.matching_score <- dirac.rank_matching_score.vector(
+            rank_matrix,
+            p2.rank_template
+        )
+        # Return the difference between the two
+        p1.matching_score - p2.matching_score
     }
-    return(
-      function(expression) {
-        # Get the rank matching score difference
-        rmd <- rank_matching.diff(expression)
-        ifelse(rmd > 0, names[1], names[2])
-      }
-    )
-  } else if (return == "is phenotype1") {
-    return(
-      function(expression) {
-        # Get the rank matching score difference
-        rmd <- rank_matching.diff(expression)
-        (rmd > 0)
-      }
-    )
-  } else if (return == "is phenotype2") {
-    return(
-      function(expression) {
-        # Get the rank matching score difference
-        rmd <- rank_matching.diff(expression)
-        (rmd <= 0)
-      }
-    )
-  } else if (return == "phenotype number") {
-    return(
-      function(expression) {
-        # Get the rank matching score difference
-        rmd <- rank_matching.diff(expression)
-        ifelse(rmd > 0, 1, 2)
-      }
-    )
-  } else {
-    return(
-      function(expression) {
-        # Get the rank matching score difference
-        rmd <- rank_matching.diff(expression)
-        rmd
-      }
-    )
-  }
+    # Based on desired return type, define a function
+    if (return == "name") {
+        if (is.null(names)) {
+            names <- c("phenotype1", "phenotype2")
+        }
+        return(
+            function(expression) {
+                # Get the rank matching score difference
+                rmd <- rank_matching.diff(expression)
+                ifelse(rmd > 0, names[1], names[2])
+            }
+        )
+    } else if (return == "is phenotype1") {
+        return(
+            function(expression) {
+                # Get the rank matching score difference
+                rmd <- rank_matching.diff(expression)
+                (rmd > 0)
+            }
+        )
+    } else if (return == "is phenotype2") {
+        return(
+            function(expression) {
+                # Get the rank matching score difference
+                rmd <- rank_matching.diff(expression)
+                (rmd <= 0)
+            }
+        )
+    } else if (return == "phenotype number") {
+        return(
+            function(expression) {
+                # Get the rank matching score difference
+                rmd <- rank_matching.diff(expression)
+                ifelse(rmd > 0, 1, 2)
+            }
+        )
+    } else {
+        return(
+            function(expression) {
+                # Get the rank matching score difference
+                rmd <- rank_matching.diff(expression)
+                rmd
+            }
+        )
+    }
 }
 
 
+
+
+
+# Bootstrap Score ---------------------------------------------------------
+
+diracBootstrapScore <- function(expression,
+                                geneNetwork,
+                                phenotype1,
+                                phenotype2,
+                                bootstrapIterations=1000,
+                                replace=TRUE,
+                                asFrame=TRUE){
+  bootstrapScore(geneNetwork = geneNetwork, expression=expression,
+                 rankFun=diracRankFunction, scoreFun = diracScoreFunction,
+                 phenotype1 = phenotype1, phenotype2 = phenotype2,
+                 bootstrapIterations = bootstrapIterations,
+                 replace = replace)
+}
+
+
+# Compare Phenotypes ------------------------------------------------------
+diracComparePhenotypes <- function(expression,
+                                   geneNetworkList,
+                                   phenotype1,
+                                   phenotype2,
+                                   bootstrapIterations=1000,
+                                   replace=TRUE,
+                                   asFrame=TRUE){
+  comparePhenotypes(expression=expression, geneNetworkList=geneNetworkList,
+                    phenotype1=phenotype1, phenotype2=phenotype2,
+                    rankFun=diracRankFunction, scoreFun=diracScoreFunction,
+                    bootstrapIterations = bootstrapIterations,
+                    replace=replace, asFrame=asFrame)
+}
+
+
+# Rank Function -----------------------------------------------------------
+
+diracRankVector <- function(expressionVector, expressionLength=NULL,
+                            matrixIndex=NULL){
+  ## Calculate expressionLength if needed
+  if(is.null(expressionLength)){
+    expressionLength <- length(expressionVector)
+  }
+  ## Calculate matrixIndex if needed
+  if(is.null(matrixIndex)){
+    matrixIndex <- lower.tri(matrix(1, nrow = expressionLength,
+                                    ncol = expressionLength,))
+  }
+  expressionMatrix <- matrix(expressionVector, nrow = expressionLength,
+                             ncol = expressionLength, byrow=TRUE)
+  ((expressionMatrix-t(expressionMatrix)) < 0)[matrixIndex]
+}
+
+# This is given a filtered expression object
+diracRankFunction <- function(filteredExpression){
+  # Calculate expression length
+  expressionLength <- nrow(filteredExpression)
+  matrixIndex <- as.vector(
+    lower.tri(matrix(1, nrow = expressionLength, ncol = expressionLength))
+  )
+  apply(filteredExpression, 2, diracRankVector,
+        expressionLength = expressionLength, matrixIndex=matrixIndex)
+}
+# Score Function ----------------------------------------------------------
+
+diracRankTemplate <- function(rankMatrix){
+  means <- rowMeans(rankMatrix)
+  means > 0.5
+}
+
+
+diracRankMatchingScore <- function(rankVector, rankTemplate){
+  if(length(rankVector)!=length(rankTemplate)){
+    stop("rankVector and rankTemplate must be same length")
+  }
+  mean(rankVector==rankTemplate)
+}
+
+diracMatrixMatchingScore <- function(rankMatrix, rankTemplate){
+  apply(rankMatrix, 2, diracRankMatchingScore, rankTemplate=rankTemplate)
+}
+
+diracScoreFunction <- function(rankMatrix, rankTemplate){
+  mean(diracMatrixMatchingScore(rankMatrix=rankMatrix,
+                                rankTemplate=rankTemplate))
+}
+
+
+# Sample Score ------------------------------------------------------------
+
+diracSampleScore <- function(filteredExpression){
+  rankMatrix <- diracRankFunction(filteredExpression=filteredExpression)
+  rankTemplate <- diracRankTemplate(rankMatrix=rankMatrix)
+  diracMatrixMatchingScore(rankMatrix=rankMatrix, rankTemplate=rankTemplate)
+}
+
+
+
 # Helper Functions --------------------------------------------------------
-
-
-
-
 #' Determine DIRAC ranking vector
 #'
 #' `dirac.rank_vector` creates a DIRAC ranking vector from expression data.
@@ -269,25 +365,25 @@ DIRAC.classifier <- function(expression, phenotype1, phenotype2, gene_index,
 dirac.rank_vector <- function(expression,
                               expression.length = NULL,
                               matrix.index = NULL) {
-  # Calculate the expression.length if needed
-  if (is.null(expression.length)) {
-    expression.length <- length(expression)
-  }
-  # Calculate the matrix.index if needed
-  if (is.null(matrix.index)) {
-    matrix.index <- lower.tri(matrix(1,
-      nrow = expression.length,
-      ncol = expression.length
-    ))
-  }
-  # Create a square matrix from the gene expression data,
-  # used for finding pairwise rank comparison
-  expression.matrix <- matrix(expression,
-    nrow = expression.length,
-    ncol = expression.length,
-    byrow = TRUE
-  )
-  ((expression.matrix - t(expression.matrix)) < 0)[matrix.index]
+    # Calculate the expression.length if needed
+    if (is.null(expression.length)) {
+        expression.length <- length(expression)
+    }
+    # Calculate the matrix.index if needed
+    if (is.null(matrix.index)) {
+        matrix.index <- lower.tri(matrix(1,
+            nrow = expression.length,
+            ncol = expression.length
+        ))
+    }
+    # Create a square matrix from the gene expression data,
+    # used for finding pairwise rank comparison
+    expression.matrix <- matrix(expression,
+        nrow = expression.length,
+        ncol = expression.length,
+        byrow = TRUE
+    )
+    ((expression.matrix - t(expression.matrix)) < 0)[matrix.index]
 }
 
 #' Determine DIRAC ranking matrix
@@ -304,17 +400,17 @@ dirac.rank_vector <- function(expression,
 #'
 #' @export
 dirac.rank_matrix <- function(expression) {
-  # Calculate the expression.length (number of genes)
-  expression.length <- nrow(expression)
-  # Calculate the matrix.index vector
-  matrix.index <- as.vector(
-    lower.tri(matrix(1, nrow = expression.length, ncol = expression.length))
-  )
-  # Apply the rank_vector function to find the rank_vector of each column
-  apply(expression, 2, dirac.rank_vector,
-    expression.length = expression.length,
-    matrix.index = matrix.index
-  )
+    # Calculate the expression.length (number of genes)
+    expression.length <- nrow(expression)
+    # Calculate the matrix.index vector
+    matrix.index <- as.vector(
+        lower.tri(matrix(1, nrow = expression.length, ncol = expression.length))
+    )
+    # Apply the rank_vector function to find the rank_vector of each column
+    apply(expression, 2, dirac.rank_vector,
+        expression.length = expression.length,
+        matrix.index = matrix.index
+    )
 }
 
 
@@ -334,10 +430,10 @@ dirac.rank_matrix <- function(expression) {
 #'
 #' @export
 dirac.rank_template <- function(rank_matrix) {
-  # Take the row means to get the conditional probability
-  means <- rowMeans(rank_matrix)
-  # Determine which rows have probability below 0.5
-  means > 0.5
+    # Take the row means to get the conditional probability
+    means <- rowMeans(rank_matrix)
+    # Determine which rows have probability below 0.5
+    means > 0.5
 }
 
 #' Find rank matching score
@@ -355,10 +451,10 @@ dirac.rank_template <- function(rank_matrix) {
 #' dirac.rank_matching_score(c(1, 0, 0, 1, 0), c(0, 1, 0, 1, 0))
 #' @export
 dirac.rank_matching_score <- function(rank_vector, rank_template) {
-  if (length(rank_vector) != length(rank_template)) {
-    stop("rank_vector and rank_template must be same length")
-  }
-  mean((rank_vector == rank_template))
+    if (length(rank_vector) != length(rank_template)) {
+        stop("rank_vector and rank_template must be same length")
+    }
+    mean((rank_vector == rank_template))
 }
 
 #' Find rank matching score across samples
@@ -379,9 +475,9 @@ dirac.rank_matching_score <- function(rank_vector, rank_template) {
 #' dirac.rank_matching_score.vector(rank_matrix, rank_template)
 #' @export
 dirac.rank_matching_score.vector <- function(rank_matrix, rank_template) {
-  apply(rank_matrix, 2, dirac.rank_matching_score,
-    rank_template = rank_template
-  )
+    apply(rank_matrix, 2, dirac.rank_matching_score,
+        rank_template = rank_template
+    )
 }
 
 #' Find rank conservation index
@@ -402,10 +498,10 @@ dirac.rank_matching_score.vector <- function(rank_matrix, rank_template) {
 #' dirac.rank_conservation_index(rank_matrix, rank_template)
 #' @export
 dirac.rank_conservation_index <- function(rank_matrix, rank_template) {
-  mean(dirac.rank_matching_score.vector(
-    rank_matrix = rank_matrix,
-    rank_template = rank_template
-  ))
+    mean(dirac.rank_matching_score.vector(
+        rank_matrix = rank_matrix,
+        rank_template = rank_template
+    ))
 }
 
 #' Find the Rank Difference Score
@@ -427,30 +523,30 @@ dirac.rank_conservation_index <- function(rank_matrix, rank_template) {
 #' @examples
 #' expression <- matrix(1:16, ncol = 4, nrow = 4)
 #' dirac.rank_difference_score(expression,
-#'   phenotype1 = c(1, 4), phenotype2 =
-#'     c(2, 3), gene_index = c(1, 2, 4)
+#'     phenotype1 = c(1, 4), phenotype2 =
+#'         c(2, 3), gene_index = c(1, 2, 4)
 #' )
 #' @export
 dirac.rank_difference_score <- function(expression, phenotype1, phenotype2,
                                         gene_index) {
-  # Find the rank matrix for each phenotype
-  p1.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype1])
-  p2.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype2])
-  # Find the rank templates for the gene network in each of the phenotypes
-  p1.rank_template <- dirac.rank_template(p1.rank_matrix)
-  p2.rank_template <- dirac.rank_template(p2.rank_matrix)
-  # Find the rank difference score for each phenotype
-  p1.rank_difference <- dirac.rank_matching_score.vector(
-    p1.rank_matrix,
-    p1.rank_template
-  ) -
-    dirac.rank_matching_score.vector(p1.rank_matrix, p2.rank_template)
-  p2.rank_difference <- dirac.rank_matching_score.vector(
-    p2.rank_matrix,
-    p1.rank_template
-  ) -
-    dirac.rank_matching_score.vector(p2.rank_matrix, p2.rank_template)
-  list(p1.rank_difference, p2.rank_difference)
+    # Find the rank matrix for each phenotype
+    p1.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype1])
+    p2.rank_matrix <- dirac.rank_matrix(expression[gene_index, phenotype2])
+    # Find the rank templates for the gene network in each of the phenotypes
+    p1.rank_template <- dirac.rank_template(p1.rank_matrix)
+    p2.rank_template <- dirac.rank_template(p2.rank_matrix)
+    # Find the rank difference score for each phenotype
+    p1.rank_difference <- dirac.rank_matching_score.vector(
+        p1.rank_matrix,
+        p1.rank_template
+    ) -
+        dirac.rank_matching_score.vector(p1.rank_matrix, p2.rank_template)
+    p2.rank_difference <- dirac.rank_matching_score.vector(
+        p2.rank_matrix,
+        p1.rank_template
+    ) -
+        dirac.rank_matching_score.vector(p2.rank_matrix, p2.rank_template)
+    list(p1.rank_difference, p2.rank_difference)
 }
 
 
@@ -480,27 +576,27 @@ dirac.rank_difference_score <- function(expression, phenotype1, phenotype2,
 #' @export
 dirac.classification_rate <- function(gene_index, expression, phenotype1,
                                       phenotype2) {
-  # Get the rank differences
-  rank_diff <- dirac.rank_difference_score(expression,
-    phenotype1 = phenotype1,
-    phenotype2 = phenotype2,
-    gene_index = gene_index
-  )
-  # Unpack the list
-  p1.rank_diff <- rank_diff[[1]]
-  p2.rank_diff <- rank_diff[[2]]
-  # calculate Pr(diff_score>O|phenotype=A), number true positives
-  tp <- mean(p1.rank_diff > 0)
-  # calculate Pr(diff_score<=O|phenotype=B), number true negative
-  tn <- mean(p2.rank_diff <= 0)
-  # Calculate Pr(phenotype=A) and Pr(phenotype=B)
-  p1.num <- length(phenotype1)
-  p2.num <- length(phenotype2)
-  total <- p1.num + p2.num
-  p1.prob <- p1.num / total
-  p2.prob <- p2.num / total
-  # Calculate the classification rate
-  (tp * p1.prob + tn * p2.prob)
+    # Get the rank differences
+    rank_diff <- dirac.rank_difference_score(expression,
+        phenotype1 = phenotype1,
+        phenotype2 = phenotype2,
+        gene_index = gene_index
+    )
+    # Unpack the list
+    p1.rank_diff <- rank_diff[[1]]
+    p2.rank_diff <- rank_diff[[2]]
+    # calculate Pr(diff_score>O|phenotype=A), number true positives
+    tp <- mean(p1.rank_diff > 0)
+    # calculate Pr(diff_score<=O|phenotype=B), number true negative
+    tn <- mean(p2.rank_diff <= 0)
+    # Calculate Pr(phenotype=A) and Pr(phenotype=B)
+    p1.num <- length(phenotype1)
+    p2.num <- length(phenotype2)
+    total <- p1.num + p2.num
+    p1.prob <- p1.num / total
+    p2.prob <- p2.num / total
+    # Calculate the classification rate
+    (tp * p1.prob + tn * p2.prob)
 }
 
 #' Compare classification rate for different gene networks
@@ -537,62 +633,62 @@ dirac.classification_rate.compare <- function(expression, phenotype1,
                                               phenotype2, gene_index,
                                               parallel = TRUE, cores = 4,
                                               as.frame = FALSE) {
-  if (parallel) {
-    cores <- if (parallel::detectCores() > cores) cores else parallel::detectCores()
-  }
-  os_type <- .Platform$OS.type
-  if (parallel && os_type == "unix") {
-    res <- unlist(
-      parallel::mclapply(gene_index, dirac.classification_rate,
-        expression = expression, phenotype1 = phenotype1,
-        phenotype2 = phenotype2,
-        mc.cores = cores
-      )
-    )
-  } else if (parallel && os_type == "windows") {
-    # make cluster
-    cl <- parallel::makeCluster(cores)
-    # Export needed functions to cluster
-    parallel::clusterExport(cl, list(
-      "dirac.rank_matching_score",
-      "dirac.rank_vector",
-      "dirac.rank_template",
-      "dirac.rank_matrix",
-      "dirac.rank_matching_score.vector",
-      "dirac.rank_difference_score",
-      "dirac.classification_rate"
-    ))
-    # Perform calculation
-    res <- tryCatch(
-      expr = {
-        unlist(parallel::parLapply(cl, gene_index, dirac.classification_rate,
-          expression = expression,
-          phenotype1 = phenotype1,
-          phenotype2 = phenotype2
+    if (parallel) {
+        cores <- if (parallel::detectCores() > cores) cores else parallel::detectCores()
+    }
+    os_type <- .Platform$OS.type
+    if (parallel && os_type == "unix") {
+        res <- unlist(
+            parallel::mclapply(gene_index, dirac.classification_rate,
+                expression = expression, phenotype1 = phenotype1,
+                phenotype2 = phenotype2,
+                mc.cores = cores
+            )
+        )
+    } else if (parallel && os_type == "windows") {
+        # make cluster
+        cl <- parallel::makeCluster(cores)
+        # Export needed functions to cluster
+        parallel::clusterExport(cl, list(
+            "dirac.rank_matching_score",
+            "dirac.rank_vector",
+            "dirac.rank_template",
+            "dirac.rank_matrix",
+            "dirac.rank_matching_score.vector",
+            "dirac.rank_difference_score",
+            "dirac.classification_rate"
         ))
-      },
-      # Whether there is an error or not, stop the cluster
-      finally = {
-        parallel::stopCluster(cl)
-      }
-    )
-  } else if (parallel) {
-    stop("Unsupported OS for parallel operation")
-  } else {
-    res <- unlist(
-      lapply(gene_index, dirac.classification_rate,
-        expression = expression,
-        phenotype1 = phenotype1, phenotype2 = phenotype2
-      )
-    )
-  }
-  if (!as.frame) {
-    # Rename the results based on the names of the gene_index list arg
-    names(res) <- names(gene_index)
-    # Return the renamed results
-    return(res)
-  }
-  data.frame(gene_network = names(gene_index), classification_rate = res)
+        # Perform calculation
+        res <- tryCatch(
+            expr = {
+                unlist(parallel::parLapply(cl, gene_index, dirac.classification_rate,
+                    expression = expression,
+                    phenotype1 = phenotype1,
+                    phenotype2 = phenotype2
+                ))
+            },
+            # Whether there is an error or not, stop the cluster
+            finally = {
+                parallel::stopCluster(cl)
+            }
+        )
+    } else if (parallel) {
+        stop("Unsupported OS for parallel operation")
+    } else {
+        res <- unlist(
+            lapply(gene_index, dirac.classification_rate,
+                expression = expression,
+                phenotype1 = phenotype1, phenotype2 = phenotype2
+            )
+        )
+    }
+    if (!as.frame) {
+        # Rename the results based on the names of the gene_index list arg
+        names(res) <- names(gene_index)
+        # Return the renamed results
+        return(res)
+    }
+    data.frame(gene_network = names(gene_index), classification_rate = res)
 }
 
 
@@ -620,11 +716,11 @@ dirac.classification_rate.compare <- function(expression, phenotype1,
 #' @export
 dirac.classification_rate.best <- function(expression, phenotype1, phenotype2,
                                            gene_index, parallel = TRUE, cores = 4) {
-  names(which.max(dirac.classification_rate.compare(expression, phenotype1,
-    phenotype2, gene_index, parallel,
-    cores,
-    as.frame = FALSE
-  )))
+    names(which.max(dirac.classification_rate.compare(expression, phenotype1,
+        phenotype2, gene_index, parallel,
+        cores,
+        as.frame = FALSE
+    )))
 }
 
 
@@ -643,23 +739,23 @@ dirac.classification_rate.best <- function(expression, phenotype1, phenotype2,
 #' # example code
 #' @export
 dirac.compare_phenotype.single <- function(rank_matrix, phenotype1, phenotype2) {
-  # Get the rank matrices for each of the phenotypes
-  p1.rank_matrix <- rank_matrix[, phenotype1]
-  p2.rank_matrix <- rank_matrix[, phenotype2]
-  # Get the rank templates for each of the phenotypes
-  p1.rank_template <- dirac.rank_template(p1.rank_matrix)
-  p2.rank_template <- dirac.rank_template(p2.rank_matrix)
-  # Get the rank conservation indices
-  p1.rank_conservation_index <- dirac.rank_conservation_index(
-    p1.rank_matrix,
-    p1.rank_template
-  )
-  p2.rank_conservation_index <- dirac.rank_conservation_index(
-    p2.rank_matrix,
-    p2.rank_template
-  )
-  # Return the absolute value of the difference between the two
-  abs(p1.rank_conservation_index - p2.rank_conservation_index)
+    # Get the rank matrices for each of the phenotypes
+    p1.rank_matrix <- rank_matrix[, phenotype1]
+    p2.rank_matrix <- rank_matrix[, phenotype2]
+    # Get the rank templates for each of the phenotypes
+    p1.rank_template <- dirac.rank_template(p1.rank_matrix)
+    p2.rank_template <- dirac.rank_template(p2.rank_matrix)
+    # Get the rank conservation indices
+    p1.rank_conservation_index <- dirac.rank_conservation_index(
+        p1.rank_matrix,
+        p1.rank_template
+    )
+    p2.rank_conservation_index <- dirac.rank_conservation_index(
+        p2.rank_matrix,
+        p2.rank_template
+    )
+    # Return the absolute value of the difference between the two
+    abs(p1.rank_conservation_index - p2.rank_conservation_index)
 }
 
 
@@ -694,21 +790,21 @@ dirac.compare_phenotype.single <- function(rank_matrix, phenotype1, phenotype2) 
 #' @export
 dirac.compare_phenotype.shuffle <- function(i, rank_matrix, combined, p1.size,
                                             p2.size, replace = TRUE) {
-  if (replace) {
-    # Sample combined for p1 indices
-    p1.idx <- sample(combined, p1.size, replace = replace)
-    # Repeat for p2 indices
-    p2.idx <- sample(combined, p2.size, replace = replace)
-  } else {
-    # sample for p1 indices
-    p1.idx <- sample(combined, p1.size, replace = replace)
-    # Get all the elements from combined not in p1, and put into p2.idx
-    p2.idx <- setdiff(combined, p1.idx)
-  }
-  dirac.compare_phenotype.single(
-    rank_matrix = rank_matrix, phenotype1 = p1.idx,
-    phenotype2 = p2.idx
-  )
+    if (replace) {
+        # Sample combined for p1 indices
+        p1.idx <- sample(combined, p1.size, replace = replace)
+        # Repeat for p2 indices
+        p2.idx <- sample(combined, p2.size, replace = replace)
+    } else {
+        # sample for p1 indices
+        p1.idx <- sample(combined, p1.size, replace = replace)
+        # Get all the elements from combined not in p1, and put into p2.idx
+        p2.idx <- setdiff(combined, p1.idx)
+    }
+    dirac.compare_phenotype.single(
+        rank_matrix = rank_matrix, phenotype1 = p1.idx,
+        phenotype2 = p2.idx
+    )
 }
 
 
@@ -750,92 +846,92 @@ dirac.compare_phenotype <- function(gene_index, expression, phenotype1,
                                     phenotype2, bootstrap_iterations = 1000,
                                     parallel = TRUE, cores = 4, replace = TRUE,
                                     seed = NULL) {
-  # Get size of both of the phenotypes
-  p1.size <- length(phenotype1)
-  p2.size <- length(phenotype2)
-  # Combine the phenotype vectors into one for resampling
-  combined <- c(phenotype1, phenotype2)
-  # Find the rank matrix
-  rank_matrix <- dirac.rank_matrix(expression[gene_index, ])
-  # Calculate the rank conservation index for the two phenotypes
-  p1.rank_matrix <- rank_matrix[, phenotype1]
-  p2.rank_matrix <- rank_matrix[, phenotype2]
-  p1.rank_template <- dirac.rank_template(p1.rank_matrix)
-  p2.rank_template <- dirac.rank_template(p2.rank_matrix)
-  p1.rank_conservation_index <- dirac.rank_conservation_index(
-    p1.rank_matrix,
-    p1.rank_template
-  )
-  p2.rank_conservation_index <- dirac.rank_conservation_index(
-    p2.rank_matrix,
-    p2.rank_template
-  )
-  # Calculate the absolute difference between the two rank conservation indices
-  absolute_difference <- abs(p1.rank_conservation_index -
-    p2.rank_conservation_index)
-  # Now perform the bootstrapping to find the null distribution
-  if (parallel) {
-    cores <- if (parallel::detectCores() > cores) cores else parallel::detectCores()
-  }
-  os_type <- .Platform$OS.type
-  if (parallel && os_type == "unix") {
-    # Set seed for
-    set.seed(seed, "L'Ecuyer")
-    res <- unlist(parallel::mclapply(1:bootstrap_iterations,
-      dirac.compare_phenotype.shuffle,
-      rank_matrix = rank_matrix, combined = combined,
-      p1.size = p1.size, p2.size = p2.size,
-      replace = replace, mc.cores = cores
-    ))
-  } else if (parallel && os_type == "windows") {
-    # make cluster
-    cl <- parallel::makeCluster(cores)
-    # Set the RNG stream seed
-    parallel::clusterSetRNGStream(cl, seed)
-    # Export Needed functions to cluster
-    parallel::clusterExport(cl, list(
-      "dirac.rank_vector",
-      "dirac.rank_matrix",
-      "dirac.rank_matching_score",
-      "dirac.rank_matching_score.vector",
-      "dirac.rank_conservation_index",
-      "dirac.rank_template",
-      "dirac.compare_phenotype.single",
-      "dirac.compare_phenotype.shuffle"
-    ))
-    # Run the bootstrap
-    res <- tryCatch(
-      expr = {
-        unlist(parallel::parLapply(cl, 1:bootstrap_iterations,
-          dirac.compare_phenotype.shuffle,
-          rank_matrix = rank_matrix,
-          combined = combined, p1.size = p1.size,
-          p2.size = p2.size, replace = replace
-        ))
-      },
-      finally = {
-        parallel::stopCluster(cl)
-      }
+    # Get size of both of the phenotypes
+    p1.size <- length(phenotype1)
+    p2.size <- length(phenotype2)
+    # Combine the phenotype vectors into one for resampling
+    combined <- c(phenotype1, phenotype2)
+    # Find the rank matrix
+    rank_matrix <- dirac.rank_matrix(expression[gene_index, ])
+    # Calculate the rank conservation index for the two phenotypes
+    p1.rank_matrix <- rank_matrix[, phenotype1]
+    p2.rank_matrix <- rank_matrix[, phenotype2]
+    p1.rank_template <- dirac.rank_template(p1.rank_matrix)
+    p2.rank_template <- dirac.rank_template(p2.rank_matrix)
+    p1.rank_conservation_index <- dirac.rank_conservation_index(
+        p1.rank_matrix,
+        p1.rank_template
     )
-  } else if (parallel) {
-    stop("Unsupported OS for parallel operation")
-  } else {
-    set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
-    res <- unlist(lapply(1:bootstrap_iterations, dirac.compare_phenotype.shuffle,
-      rank_matrix = rank_matrix, combined = combined,
-      p1.size = p1.size, p2.size = p1.size, replace = replace
-    ))
-  }
-  # Now, use the bootstrapped values to create an empirical cdf
-  boot_cdf <- stats::ecdf(res)
-  # Get the p-value for the value
-  p.value <- 1 - boot_cdf(absolute_difference)
-  # Return named list with value being the difference, and p.value being
-  #   the p.value calculated using the empirical cdf
-  list(
-    p1.rank_conservation_index = p1.rank_conservation_index,
-    p2.rank_conservation_index = p2.rank_conservation_index,
-    absolute_difference = absolute_difference,
-    p.value = p.value
-  )
+    p2.rank_conservation_index <- dirac.rank_conservation_index(
+        p2.rank_matrix,
+        p2.rank_template
+    )
+    # Calculate the absolute difference between the two rank conservation indices
+    absolute_difference <- abs(p1.rank_conservation_index -
+        p2.rank_conservation_index)
+    # Now perform the bootstrapping to find the null distribution
+    if (parallel) {
+        cores <- if (parallel::detectCores() > cores) cores else parallel::detectCores()
+    }
+    os_type <- .Platform$OS.type
+    if (parallel && os_type == "unix") {
+        # Set seed for
+        set.seed(seed, "L'Ecuyer")
+        res <- unlist(parallel::mclapply(1:bootstrap_iterations,
+            dirac.compare_phenotype.shuffle,
+            rank_matrix = rank_matrix, combined = combined,
+            p1.size = p1.size, p2.size = p2.size,
+            replace = replace, mc.cores = cores
+        ))
+    } else if (parallel && os_type == "windows") {
+        # make cluster
+        cl <- parallel::makeCluster(cores)
+        # Set the RNG stream seed
+        parallel::clusterSetRNGStream(cl, seed)
+        # Export Needed functions to cluster
+        parallel::clusterExport(cl, list(
+            "dirac.rank_vector",
+            "dirac.rank_matrix",
+            "dirac.rank_matching_score",
+            "dirac.rank_matching_score.vector",
+            "dirac.rank_conservation_index",
+            "dirac.rank_template",
+            "dirac.compare_phenotype.single",
+            "dirac.compare_phenotype.shuffle"
+        ))
+        # Run the bootstrap
+        res <- tryCatch(
+            expr = {
+                unlist(parallel::parLapply(cl, 1:bootstrap_iterations,
+                    dirac.compare_phenotype.shuffle,
+                    rank_matrix = rank_matrix,
+                    combined = combined, p1.size = p1.size,
+                    p2.size = p2.size, replace = replace
+                ))
+            },
+            finally = {
+                parallel::stopCluster(cl)
+            }
+        )
+    } else if (parallel) {
+        stop("Unsupported OS for parallel operation")
+    } else {
+        set.seed(seed, kind = "Mersenne-Twister", normal.kind = "Inversion")
+        res <- unlist(lapply(1:bootstrap_iterations, dirac.compare_phenotype.shuffle,
+            rank_matrix = rank_matrix, combined = combined,
+            p1.size = p1.size, p2.size = p1.size, replace = replace
+        ))
+    }
+    # Now, use the bootstrapped values to create an empirical cdf
+    boot_cdf <- stats::ecdf(res)
+    # Get the p-value for the value
+    p.value <- 1 - boot_cdf(absolute_difference)
+    # Return named list with value being the difference, and p.value being
+    #   the p.value calculated using the empirical cdf
+    list(
+        p1.rank_conservation_index = p1.rank_conservation_index,
+        p2.rank_conservation_index = p2.rank_conservation_index,
+        absolute_difference = absolute_difference,
+        p.value = p.value
+    )
 }

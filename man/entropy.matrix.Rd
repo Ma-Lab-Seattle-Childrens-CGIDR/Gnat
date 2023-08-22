@@ -20,8 +20,8 @@ corresponding row or column
 Compute entropy for a matrix
 }
 \examples{
-  # Create an example matrix
-  example_matrix <- matrix(rnorm(4*4), ncol=4)
-  # Print result vector
-  print(entropy.matrix(example_matrix, 2))
+# Create an example matrix
+example_matrix <- matrix(rnorm(4 * 4), ncol = 4)
+# Print result vector
+print(entropy.matrix(example_matrix, 2))
 }
