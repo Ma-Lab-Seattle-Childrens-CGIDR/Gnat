@@ -1,10 +1,20 @@
 testthat::test_that("Ensure named works", {
     test_list.unnamed <- list(1, 2, 3, 4)
-    test_list.named <- ensure_named(test_list.unnamed, prefix = "g_")
+    test_list.named <- ensureNamed(test_list.unnamed, prefix = "g_")
     expect_length(test_list.named, length(test_list.unnamed))
     expect_named(test_list.named, c("g_1", "g_2", "g_3", "g_4"))
     test_list.named <- list(a = 1, b = 2, c = 3, d = 4)
-    test_list.ensured <- ensure_named(test_list.named, prefix = "g_")
+    test_list.ensured <- ensureNamed(test_list.named, prefix = "g_")
     expect_length(test_list.ensured, length(test_list.named))
     expect_named(test_list.ensured, names(test_list.named))
+})
+
+test_that("Simple Rank Works",{
+    testMat <- matrix(runif(20), ncol=4, nrow=5)
+    ranked <- simpleRank(testMat)
+    expect_equal(nrow(testMat), nrow(ranked))
+    expect_equal(ncol(testMat), ncol(ranked))
+    orderedMat <- matrix(seq_len(5), ncol=4, nrow=5)
+    ranked <- simpleRank(orderedMat)
+    expect_equal(ranked, orderedMat)
 })

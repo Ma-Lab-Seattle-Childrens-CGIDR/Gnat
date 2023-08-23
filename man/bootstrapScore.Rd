@@ -2,22 +2,50 @@
 % Please edit documentation in R/bootstrap_score.R
 \name{bootstrapScore}
 \alias{bootstrapScore}
-\title{Title}
+\title{Find a p-value for the difference in entropy between two phenotypes using a
+bootstrapped distribution}
 \usage{
 bootstrapScore(
   geneNetwork,
+  expression,
   rankFun,
   scoreFun,
-  expression,
   phenotype1,
   phenotype2,
   bootstrapIterations = 1000,
-  replace = TRUE
+  replace = TRUE,
+  BPPARAM = bpparam()
 )
 }
 \arguments{
-\item{seed}{}
+\item{geneNetwork}{Index Vector, representing the indices of the genes in the
+gene network}
+
+\item{expression}{Numeric matrix of gene expression, with rows representing
+genes, and columns representing samples.}
+
+\item{rankFun}{Function for creating a rank matrix, should take a matrix of
+dim (gene, sample) as input, and return a rank matrix, with samples as the
+columns.}
+
+\item{scoreFun}{Function for scoring entropy in a phenotype, should take a
+rank matrix as input, and return a score (the rank matrix will only
+include samples within 1 phenotype)}
+
+\item{phenotype1, phenotype2}{Index vectors, representing the indices of the
+phenotypes in the expression matrix}
+
+\item{bootstrapIterations}{Integer, number of iterations to perform when
+creating the null distribution}
+
+\item{replace}{Boolean, whether sampling the phenotypes should be done with
+replacement}
+}
+\value{
+Named list of results, specifically p1Score, p2Score,
+absoluteDifference, and pValue
 }
 \description{
-Title
+Find a p-value for the difference in entropy between two phenotypes using a
+bootstrapped distribution
 }

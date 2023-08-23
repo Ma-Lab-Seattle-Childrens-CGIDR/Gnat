@@ -20,12 +20,12 @@
 #' @examples
 inferBootstrapScore <- function(expression, geneNetwork, phenotype1,
                                 phenotype2, bootstrapIterations=1000,
-                                replace=TRUE){
+                                replace=TRUE, BPPARAM=bpparam()){
     bootstrapScore(geneNetwork = geneNetwork, expression = expression,
                    rankFun=inferRankFunction, scoreFun=inferScoreFunction,
                    phenotype1=phenotype1, phenotype2=phenotype2,
                    bootstrapIterations = bootstrapIterations,
-                   replace=replace)
+                   replace=replace, BPPARAM=BPPARAM)
 }
 
 
@@ -58,12 +58,13 @@ inferBootstrapScore <- function(expression, geneNetwork, phenotype1,
 inferComparePhenotypes <- function(expression, geneNetworkList,
                                    phenotype1, phenotype2,
                                    bootstrapIterations=1000,
-                                   replace=TRUE, asFrame=TRUE){
+                                   replace=TRUE, asFrame=TRUE,
+                                   BPPARAM=bpparam()){
     comparePhenotypes(expression=expression, geneNetworkList = geneNetworkList,
                       phenotype1=phenotype1, phenotype2=phenotype2,
                       rankFun=inferRankFunction, scoreFun=inferScoreFunction,
                       bootstrapIterations=bootstrapIterations,replace=replace,
-                      asFrame=asFrame)
+                      asFrame=asFrame, BPPARAM=BPPARAM)
 }
 
 # Rank Function -----------------------------------------------------------
@@ -125,24 +126,6 @@ matrixEntropy <- function(mat, margin = 1) {
     apply(mat, MARGIN = margin, vectorEntropy)
 }
 
-
-#' Find the rank entropy for each gene in a network
-#'
-#' `inferGeneEntropy` Determines the rank entropy for each gene in a network
-#'
-#' @param expression Numeric matrix representing gene expression, with
-#'    rows representing genes in the network and columns representing samples
-#'    in the phenotype.
-#'
-#' @return Numeric vector representing the entropy for each gene in the network
-#'    in the given phenotype.
-#' @export
-#'
-#' @examples
-inferGeneEntropy <- function(filteredExpression) {
-    entropy.matrix(infer.rank_matrix(filteredExpression))
-}
-
 #' Function to score a rank matrix using the INFER method, the average
 #' information entropy of genes within the network
 #'
@@ -154,6 +137,27 @@ inferGeneEntropy <- function(filteredExpression) {
 #' @export
 #'
 #' @examples
-inferScoreFunction <- function(filteredExpression){
-    mean(inferGeneEntropy(filteredExpression))
+inferScoreFunction <- function(rankMatrix){
+    mean(matrixEntropy(rankMatrix))
+}
+
+
+
+# Gene Entropy ------------------------------------------------------------
+
+#' Find the rank entropy for each gene in a network
+#'
+#' `inferGeneEntropy` Determines the rank entropy for each gene in a network
+#'
+#' @param filteredExpression Numeric matrix representing gene expression, with
+#'    rows representing genes in the network and columns representing samples
+#'    in the phenotype.
+#'
+#' @return Numeric vector representing the entropy for each gene in the network
+#'    in the given phenotype.
+#' @export
+#'
+#' @examples
+inferGeneEntropy <- function(filteredExpression) {
+    matrixEntropy(inferRankFunction(filteredExpression = filteredExpression))
 }

@@ -20,12 +20,12 @@
 #' @examples
 craneBootstrapScore <- function(expression, geneNetwork, phenotype1,
                                 phenotype2, bootstrapIterations=1000,
-                                replace=TRUE){
+                                replace=TRUE, BPPARAM=bpparam()){
     bootstrapScore(geneNetwork = geneNetwork, expression = expression,
                    rankFun=craneRankFunction, scoreFun=craneScoreFunction,
                    phenotype1=phenotype1, phenotype2=phenotype2,
                    bootstrapIterations = bootstrapIterations,
-                   replace=replace)
+                   replace=replace, BPPARAM=BPPARAM)
 }
 
 
@@ -59,12 +59,13 @@ craneBootstrapScore <- function(expression, geneNetwork, phenotype1,
 craneComparePhenotypes <- function(expression, geneNetworkList,
                                    phenotype1, phenotype2,
                                    bootstrapIterations=1000,
-                                   replace=TRUE, asFrame=TRUE){
+                                   replace=TRUE, asFrame=TRUE,
+                                   BPPARAM=bpparam()){
     comparePhenotypes(expression=expression, geneNetworkList = geneNetworkList,
                       phenotype1=phenotype1, phenotype2=phenotype2,
                       rankFun=craneRankFunction, scoreFun=craneScoreFunction,
                       bootstrapIterations=bootstrapIterations,replace=replace,
-                      asFrame=asFrame)
+                      asFrame=asFrame, BPPARAM=BPPARAM)
 }
 
 
@@ -103,8 +104,7 @@ craneRankFunction <- function(filteredExpression){
 #' @examples
 craneScoreFunction <- function(rankMatrix){
     centroid <- apply(rankMatrix, MARGIN=1, mean, na.rm=TRUE)
-    sd <- (rankMatrix-centroid)^2
-    mean(sqrt(apply(sd, MARGIN=2, sum)))
+    mean(sqrt(apply((rankMatrix-centroid)^2, MARGIN=2, sum)))
 }
 
 

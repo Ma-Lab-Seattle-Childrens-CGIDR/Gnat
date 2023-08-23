@@ -22,12 +22,12 @@
 #' @examples
 raceBootstrapScore <- function(expression, geneNetwork, phenotype1,
                                 phenotype2, bootstrapIterations=1000,
-                                replace=TRUE){
+                                replace=TRUE, BPPARAM=bpparam()){
     bootstrapScore(geneNetwork = geneNetwork, expression = expression,
                    rankFun=raceRankFunction, scoreFun=raceScoreFunction,
                    phenotype1=phenotype1, phenotype2=phenotype2,
                    bootstrapIterations = bootstrapIterations,
-                   replace=replace)
+                   replace=replace, BPPARAM=BPPARAM)
 }
 
 # Compare Phenotypes ------------------------------------------------------
@@ -58,12 +58,13 @@ raceBootstrapScore <- function(expression, geneNetwork, phenotype1,
 #' @examples
 raceComparePhenotypes <- function(expression, geneNetworkList, phenotype1,
                                   phenotype2, bootstrapIterations=1000,
-                                  replace=TRUE, asFrame=TRUE){
+                                  replace=TRUE, asFrame=TRUE,
+                                  BPPARAM=bpparam()){
     comparePhenotypes(expression=expression, geneNetworkList = geneNetworkList,
                       phenotype1=phenotype1, phenotype2=phenotype2,
                       rankFun=raceRankFunction, scoreFun=raceScoreFunction,
                       bootstrapIterations=bootstrapIterations,replace=replace,
-                      asFrame=asFrame)
+                      asFrame=asFrame, BPPARAM=BPPARAM)
 }
 
 

@@ -2,14 +2,14 @@
 
 #' Generates gene expression data with ordered sub network
 #'
-#' @param ngenes.ordered Integer, number of genes in the ordered sub network.
-#' @param ngenes.total Integer, total number of genes desired.
-#' @param nsamples.ordered Integer, number of samples in the ordered phenotype.
-#' @param nsamples.total Integer, total number of samples
+#' @param ngenesOrdered Integer, number of genes in the ordered sub network.
+#' @param ngenesTotal Integer, total number of genes desired.
+#' @param nsamplesOrdered Integer, number of samples in the ordered phenotype.
+#' @param nsamplesTotal Integer, total number of samples
 #' @param dist Function, distribution to use for generating data. It is passed
 #'    ngenes (for number of values to generate), and any other keyword
 #'    arguments. Must return a numeric vector.
-#' @param reorder.genes Boolean, whether the order of genes within the ordered
+#' @param reorderGenes Boolean, whether the order of genes within the ordered
 #'   sub network should be shuffled. If TRUE, the order of the genes in the
 #'   network will be randomly reshuffled. If FALSE, the genes within the network
 #'   will always have their expression values increase with increasing row
@@ -20,40 +20,40 @@
 #'    expression: Numeric matrix of gene expression values with an ordered
 #'      sub network. There will be ngenes.total rows representing genes, and
 #'      nsamples.total columns representing samples.
-#'    ordered.genes: Integer vector with the indices of the genes within
+#'    orderedGenes: Integer vector with the indices of the genes within
 #'      the ordered sub network. These will be in ascending order, so the gene
 #'      with the lowest expression values will be in the row represented by the
 #'      first index, and the gene with the highest expression will be
 #'      represented by the last index.
-#'    ordered.samples: Integer vector containing the indices of the samples
+#'    orderedSamples: Integer vector containing the indices of the samples
 #'      within the ordered phenotype.
 #' @export
 #'
 #' @examples
-datagen.generate <- function(ngenes.ordered, ngenes.total, nsamples.ordered,
-                             nsamples.total, dist, reorder.genes = TRUE, ...) {
-    expression.matrix <- datagen.unordered.matrix(
-        ngenes.total,
-        nsamples.total,
+datagenGenerate <- function(ngenesOrdered, ngenesTotal, nsamplesOrdered,
+                             nsamplesTotal, dist, reorderGenes = TRUE, ...) {
+    expressionMatrix <- datagenUnorderedMatrix(
+        ngenesTotal,
+        nsamplesTotal,
         dist, ...
     )
-    ordered.expression <- datagen.ordered.matrix(
-        ngenes.ordered, nsamples.ordered,
+    orderedExpression <- datagenOrderedMatrix(
+        ngenesOrdered, nsamplesOrdered,
         dist, ...
     )
-    ordered.genes <- sample(ngenes.total, ngenes.ordered, replace = FALSE)
-    ordered.samples <- sample(nsamples.total, nsamples.ordered, replace = FALSE)
-    if (!reorder.genes) {
-        ordered.genes <- sort(ordered.genes)
+    orderedGenes <- sample(ngenesTotal, ngenesOrdered, replace = FALSE)
+    ordered.samples <- sample(nsamplesTotal, nsamplesOrdered, replace = FALSE)
+    if (!reorderGenes) {
+        orderedGenes <- sort(orderedGenes)
     }
-    for (i in 1:ngenes.ordered) {
-        expression.matrix[ordered.genes[i], ordered.samples] <-
-            ordered.expression[i, ]
+    for (i in 1:ngenesOrdered) {
+        expressionMatrix[orderedGenes[i], ordered.samples] <-
+            orderedExpression[i, ]
     }
     list(
-        expression = expression.matrix,
-        ordered.genes = ordered.genes,
-        ordered.samples = sort(ordered.samples)
+        expression = expressionMatrix,
+        orderedGenes = orderedGenes,
+        orderedSamples = sort(ordered.samples)
     )
 }
 
@@ -73,7 +73,7 @@ datagen.generate <- function(ngenes.ordered, ngenes.total, nsamples.ordered,
 #' @export
 #'
 #' @examples
-datagen.swap <- function(expression, nswaps) {
+datagenSwap <- function(expression, nswaps) {
     nsamples <- ncol(expression)
     ngenes <- nrow(expression)
     sample_list <- sample(nsamples, size = nswaps, replace = TRUE)
@@ -99,11 +99,12 @@ datagen.swap <- function(expression, nswaps) {
 #' @export
 #'
 #' @examples
-datagen.noise <- function(expression, dist, ...) {
+datagenNoise <- function(expression, dist, ...) {
     ngenes <- nrow(expression)
     nsamples <- ncol(expression)
-    noise.matrix <- matrix(dist(ngenes * nsamples, ...), nrow = ngenes, ncol = nsamples)
-    expression + noise.matrix
+    noiseMatrix <- matrix(dist(ngenes * nsamples, ...), nrow = ngenes,
+                          ncol = nsamples)
+    expression + noiseMatrix
 }
 
 #' Dropout a proportion of expression data
@@ -112,7 +113,7 @@ datagen.noise <- function(expression, dist, ...) {
 #'
 #' @param expression Numeric matrix, represents gene expression data with genes
 #'    as rows, and samples as columns.
-#' @param dropout.rate Double, representing the proportion of values to set to
+#' @param dropoutRate Double, representing the proportion of values to set to
 #'    0, 0<=dropout.rate<=1.
 #'
 #' @return Numeric matrix, expression data with dropout.rate proportion of
@@ -120,14 +121,14 @@ datagen.noise <- function(expression, dist, ...) {
 #' @export
 #'
 #' @examples
-datagen.dropout <- function(expression, dropout.rate) {
+datagenDropout <- function(expression, droupoutRate) {
     ngenes <- nrow(expression)
     nsamples <- ncol(expression)
-    nvalues.drop <- floor(dropout.rate * (ngenes * nsamples))
-    drop.index <- sample(ngenes * nsamples, size = nvalues.drop, replace = FALSE)
-    drop.vector <- logical(ngenes * nsamples)
-    drop.vector[drop.index] <- TRUE
-    expression[drop.vector] <- 0
+    nvaluesDrop <- floor(droupoutRate * (ngenes * nsamples))
+    dropIndex <- sample(ngenes * nsamples, size = nvaluesDrop, replace = FALSE)
+    dropVector <- logical(ngenes * nsamples)
+    dropVector[dropIndex] <- TRUE
+    expression[dropVector] <- 0
     expression
 }
 
@@ -146,9 +147,9 @@ datagen.dropout <- function(expression, dropout.rate) {
 #' @export
 #'
 #' @examples
-datagen.ordered.vector <- function(ngenes, dist, ...) {
-    expression.unordered <- dist(ngenes, ...)
-    sort(expression.unordered, decreasing = FALSE)
+datagenOrderedVector <- function(ngenes, dist, ...) {
+    expressionUnordered <- dist(ngenes, ...)
+    sort(expressionUnordered, decreasing = FALSE)
 }
 
 
@@ -167,14 +168,14 @@ datagen.ordered.vector <- function(ngenes, dist, ...) {
 #' @export
 #'
 #' @examples
-datagen.ordered.matrix <- function(ngenes, nsamples, dist, ...) {
+datagenOrderedMatrix <- function(ngenes, nsamples, dist, ...) {
     # Create an empty expression matrix
-    expression.matrix <- matrix(0, nrow = ngenes, ncol = nsamples)
+    expressionMatrix <- matrix(0, nrow = ngenes, ncol = nsamples)
     # Generate the expression for each sample of the ordered phenotype
     for (i in 1:nsamples) {
-        expression.matrix[, i] <- datagen.ordered.vector(ngenes, dist, ...)
+        expressionMatrix[, i] <- datagenOrderedVector(ngenes, dist, ...)
     }
-    expression.matrix
+    expressionMatrix
 }
 
 
@@ -190,7 +191,7 @@ datagen.ordered.matrix <- function(ngenes, nsamples, dist, ...) {
 #' @export
 #'
 #' @examples
-datagen.unordered.vector <- function(ngenes, dist, ...) {
+datagenUnorderedVector <- function(ngenes, dist, ...) {
     dist(ngenes, ...)
 }
 
@@ -208,12 +209,12 @@ datagen.unordered.vector <- function(ngenes, dist, ...) {
 #' @export
 #'
 #' @examples
-datagen.unordered.matrix <- function(ngenes, nsamples, dist, ...) {
+datagenUnorderedMatrix <- function(ngenes, nsamples, dist, ...) {
     # Create an empty expression matrix
-    expression.matrix <- matrix(0, nrow = ngenes, ncol = nsamples)
+    expressionMatrix <- matrix(0, nrow = ngenes, ncol = nsamples)
     # Generate the expression for each sample of the ordered phenotype
     for (i in 1:nsamples) {
-        expression.matrix[, i] <- datagen.unordered.vector(ngenes, dist, ...)
+        expressionMatrix[, i] <- datagenUnorderedVector(ngenes, dist, ...)
     }
-    expression.matrix
+    expressionMatrix
 }

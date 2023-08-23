@@ -32,37 +32,39 @@
 comparePhenotypes <-
   function(expression,
            geneNetworkList,
-           phenoytpe1,
+           phenotype1,
            phenotype2,
            rankFun,
            scoreFun,
            bootstrapIterations = 1000,
            replace = TRUE,
-           asFrame = TRUE) {
+           asFrame = TRUE,
+           BPPARAM=bpparam()) {
     # Ensure list is named
-    geneNetworkList <- ensureNamed(geneNetworkList)
+    geneNetworkList <- ensureNamed(geneNetworkList, prefix = "gn_")
     # Run the bootstrapping
     resList <- lapply(
       geneNetworkList,
-      comparePhenotypesSinge,
+      bootstrapScore,
       expression = expression,
       phenotype1 = phenotype1,
       phenotype2 = phenotype2,
+      rankFun=rankFun,
+      scoreFun=scoreFun,
       bootstrapIterations = bootstrapIterations,
-      replace = replace
+      replace = replace,
+      BPPARAM=BPPARAM
     )
     if (!asFrame) {
-      names(resList <- names(geneNetworkList))
-      resturn(resList)
+      names(resList) <- names(geneNetworkList)
+      return(resList)
     }
-    p1ScoreList <- vapply(resList, function(x)
+    p1ScoreList <- sapply(resList, function(x)
       x$p1Score)
-    p2ScoreList <- vapply(resList, function(x)
+    p2ScoreList <- sapply(resList, function(x)
       x$p2Score)
-    absoluteDifferenceList <- vapply(resList,
-                                     function(x)
-                                       x$absoluteDifference)
-    pValuesList <- vapply(resList, function(x)
+    absoluteDifferenceList <- sapply(resList, function(x) x$absoluteDifference)
+    pValuesList <- sapply(resList, function(x)
       x$pValue)
     geneNetworks <- names(geneNetworkList)
     data.frame(
@@ -154,19 +156,20 @@ scoreShuffled <-
            p2Size,
            scoreFun,
            replace = TRUE) {
-    if (replace) {
-      p1Idx <- sample(combined, p1Size, replace = replace)
-      p2Idx <- sample(combined, p2Size, repalce = replace)
-    } else {
-      p1Idx <- sample(combined, p1Size, replace = replace)
-      p2Idx <- setdiff(combined, p1Idx)
-    }
-    comparePhenotypesSingle(
-      rankMatrix = rankMatrix,
-      phenotype1 = p1Idx,
-      phenotype2 = p2Idx,
-      scoreFun = scoreFun
-    )
+      if (replace) {
+        p1Idx <- sample(combined, p1Size, replace = replace)
+        p2Idx <- sample(combined, p2Size, replace = replace)
+      } else {
+        p1Idx <- sample(combined, p1Size, replace = replace)
+        p2Idx <- setdiff(combined, p1Idx)
+      }
+      ## Can't call comparePhenotypeSingle due to snow cluster,
+      ## instead, just perform the actions here
+      p1RankMatrix <- rankMatrix[, p1Idx]
+      p2RankMatrix <- rankMatrix[, p2Idx]
+      p1Score <- scoreFun(p1RankMatrix)
+      p2Score <- scoreFun(p2RankMatrix)
+      abs(p1Score-p2Score)
   }
 
 
@@ -193,7 +196,7 @@ scoreShuffled <-
 #'
 #' @return Named list of results, specifically p1Score, p2Score,
 #'    absoluteDifference, and pValue
-#' @importFrom BiocParallel bplapply
+#' @importFrom BiocParallel bplapply SnowParam SerialParam MulticoreParam
 #' @export
 #'
 #' @examples
@@ -205,7 +208,8 @@ bootstrapScore <-
            phenotype1,
            phenotype2,
            bootstrapIterations = 1000,
-           replace = TRUE) {
+           replace = TRUE,
+           BPPARAM=bpparam()) {
     # Get the lengths of the phenotypes
     p1Size <- length(phenotype1)
     p2Size <- length(phenotype2)
@@ -213,8 +217,10 @@ bootstrapScore <-
     combinedPhenotypes <- c(phenotype1, phenotype2)
     # Compute the rank matrix using the provided method
     rankMatrix <-
-      rankFun(expression[geneNetwork, combinedPhenotypes])
-    # Compute the unshuffled score for the two phenotypes
+      rankFun(expression[geneNetwork,])
+    ## Having to rank the whole dataset to avoid issues with changes in index,
+    ## should find a way to only rank the needed phenotypes
+    ## Compute the unshuffled score for the two phenotypes
     p1Score <- scoreFun(rankMatrix[, phenotype1])
     p2Score <- scoreFun(rankMatrix[, phenotype2])
     absDiff <- abs(p1Score - p2Score)
@@ -224,10 +230,12 @@ bootstrapScore <-
           seq_len(bootstrapIterations),
           scoreShuffled,
           rankMatrix = rankMatrix,
+          combined = combinedPhenotypes,
           p1Size = p1Size,
           p2Size = p2Size,
-          replace = replace
-
+          scoreFun=scoreFun,
+          replace = replace,
+          BPPARAM = BPPARAM
         )
       )
     # Create the empirical CDF
@@ -240,4 +248,4 @@ bootstrapScore <-
       absoluteDifference = absDiff,
       pValue = pValue
     )
-  }
+}

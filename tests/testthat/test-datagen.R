@@ -1,90 +1,90 @@
 test_that("Ordered Vector Creation Works", {
     set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-    res <- datagen.ordered.vector(16, rnbinom, size = 5, mu = 15)
+    res <- datagenOrderedVector(16, rnbinom, size = 5, mu = 15)
     # Test that it is the right length
     expect_length(res, 16)
     # Test that it is in order
     expect_equal(res, sort(res))
     # Test another distribution
-    res.norm <- datagen.ordered.vector(16, rnorm, mean = 10, sd = 2)
-    expect_length(res.norm, 16)
-    expect_equal(res.norm, sort(res.norm))
+    resNorm <- datagenOrderedVector(16, rnorm, mean = 10, sd = 2)
+    expect_length(resNorm, 16)
+    expect_equal(resNorm, sort(resNorm))
     # Test that the results are approximately normal using shapiro-wilkes
     expect_gte(stats::shapiro.test(
-        datagen.ordered.vector(30, rnorm, mean = 10, sd = 2)
+        datagenOrderedVector(30, rnorm, mean = 10, sd = 2)
     )$p.value, 0.05)
 })
 
 test_that("Unordered vector creation works", {
     set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-    res <- datagen.unordered.vector(16, rnbinom, size = 5, mu = 15)
+    res <- datagenUnorderedVector(16, rnbinom, size = 5, mu = 15)
     expect_length(res, 16)
     expect_true(!all(res == sort(res)))
 })
 
 test_that("Ordered matrix creation works", {
-    expression <- datagen.ordered.matrix(10, 11, rnbinom, size = 5, mu = 15)
+    expression <- datagenOrderedMatrix(10, 11, rnbinom, size = 5, mu = 15)
     # Test for correct shape
     expect_equal(nrow(expression), 10)
     expect_equal(ncol(expression), 11)
     # Test that the ordering is true
-    res.vec <- logical(9)
+    resVec <- logical(9)
     for (i in 1:9) {
-        res.vec[i] <- all(expression[i, ] <= expression[i + 1, ])
+        resVec[i] <- all(expression[i, ] <= expression[i + 1, ])
     }
-    expect_true(all(res.vec))
+    expect_true(all(resVec))
 })
 
 test_that("Unordered matrix creation works", {
-    expression <- datagen.unordered.matrix(10, 11, rnbinom, size = 5, mu = 15)
+    expression <- datagenUnorderedMatrix(10, 11, rnbinom, size = 5, mu = 15)
     # Test for correct shape
     expect_equal(nrow(expression), 10)
     expect_equal(ncol(expression), 11)
 })
 
 test_that("Generating expression data works", {
-    res <- datagen.generate(
-        ngenes.ordered = 10,
-        nsamples.ordered = 12,
-        ngenes.total = 20,
-        nsamples.total = 18,
-        dist = rnbinom, reorder.genes = TRUE,
+    res <- datagenGenerate(
+        ngenesOrdered = 10,
+        nsamplesOrdered = 12,
+        ngenesTotal = 20,
+        nsamplesTotal = 18,
+        dist = rnbinom, reorderGenes = TRUE,
         size = 5, mu = 15
     )
     expression <- res$expression
-    ordered.genes <- res$ordered.genes
-    ordered.samples <- res$ordered.samples
+    orderedGenes <- res$orderedGenes
+    orderedSamples <- res$orderedSamples
     # Test for shape of result
     expect_equal(nrow(expression), 20)
     expect_equal(ncol(expression), 18)
     # Test for length of index vectors
-    expect_length(ordered.genes, 10)
-    expect_length(ordered.samples, 12)
+    expect_length(orderedGenes, 10)
+    expect_length(orderedSamples, 12)
     # Test that the genes are in fact ordered
-    ordered.expression <- expression[ordered.genes, ordered.samples]
-    res.vec <- logical(9)
+    orderedExpression <- expression[orderedGenes, orderedSamples]
+    resVec <- logical(9)
     for (i in 1:9) {
-        res.vec[i] <- all(ordered.expression[i, ] <= ordered.expression[i + 1, ])
+        resVec[i] <- all(orderedExpression[i, ] <= orderedExpression[i + 1, ])
     }
-    expect_true(all(res.vec))
+    expect_true(all(resVec))
 })
 
 test_that("Swap works", {
-    expression <- datagen.generate(
-        ngenes.ordered = 10,
-        nsamples.ordered = 12,
-        ngenes.total = 20,
-        nsamples.total = 18,
-        dist = rnbinom, reorder.genes = TRUE,
+    expression <- datagenGenerate(
+        ngenesOrdered = 10,
+        nsamplesOrdered = 12,
+        ngenesTotal = 20,
+        nsamplesTotal = 18,
+        dist = rnbinom, reorderGenes = TRUE,
         size = 5, mu = 15
     )$expression
-    res <- datagen.swap(expression = expression, nswaps = 20)
+    res <- datagenSwap(expression = expression, nswaps = 20)
     # Test shape of result
     expect_equal(ncol(res), ncol(expression))
     expect_equal(nrow(res), nrow(expression))
     # Test swapping effects on ordered matrix
     expression <- matrix(1:16, ncol = 4)
-    res <- datagen.swap(expression, nswaps = 1)
+    res <- datagenSwap(expression, nswaps = 1)
     # Check that there was exactly one swap
     expect_equal(sum((expression - res) != 0), 2)
 })
@@ -92,7 +92,7 @@ test_that("Swap works", {
 test_that("Adding noise works", {
     set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
     expression <- matrix(1:36, ncol = 6)
-    noisy <- datagen.noise(expression, rnorm, mean = 0, sd = 2)
+    noisy <- datagenNoise(expression, rnorm, mean = 0, sd = 2)
     # Test shape of result
     expect_equal(ncol(noisy), ncol(expression))
     expect_equal(nrow(noisy), nrow(expression))
@@ -104,7 +104,7 @@ test_that("Adding noise works", {
 
 test_that("Drop out works", {
     expression <- matrix(1:16, ncol = 4)
-    res <- datagen.dropout(expression, 3 / 16)
+    res <- datagenDropout(expression, 3 / 16)
     # Test shape of result
     expect_equal(ncol(res), ncol(expression))
     expect_equal(nrow(res), nrow(expression))

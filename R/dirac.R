@@ -255,12 +255,13 @@ diracBootstrapScore <- function(expression,
                                 phenotype2,
                                 bootstrapIterations=1000,
                                 replace=TRUE,
-                                asFrame=TRUE){
+                                asFrame=TRUE,
+                                BPPARAM=bpparam()){
   bootstrapScore(geneNetwork = geneNetwork, expression=expression,
                  rankFun=diracRankFunction, scoreFun = diracScoreFunction,
                  phenotype1 = phenotype1, phenotype2 = phenotype2,
                  bootstrapIterations = bootstrapIterations,
-                 replace = replace)
+                 replace = replace, BPPARAM=BPPARAM)
 }
 
 
@@ -271,12 +272,13 @@ diracComparePhenotypes <- function(expression,
                                    phenotype2,
                                    bootstrapIterations=1000,
                                    replace=TRUE,
-                                   asFrame=TRUE){
+                                   asFrame=TRUE,
+                                   BPPARAM=bpparam()){
   comparePhenotypes(expression=expression, geneNetworkList=geneNetworkList,
                     phenotype1=phenotype1, phenotype2=phenotype2,
                     rankFun=diracRankFunction, scoreFun=diracScoreFunction,
                     bootstrapIterations = bootstrapIterations,
-                    replace=replace, asFrame=asFrame)
+                    replace=replace, asFrame=asFrame, BPPARAM=BPPARAM)
 }
 
 

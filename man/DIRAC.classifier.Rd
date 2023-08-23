@@ -36,7 +36,8 @@ predicted phenotype is phenotype2
 Any other value will lead the function to just return the rank matching
 difference}
 
-\item{names}{optional Character vector with the desired names for the phenotypes,}
+\item{names}{optional Character vector with the desired names for the
+phenotypes}
 }
 \value{
 A function which takes as an argument a gene expression numeric
