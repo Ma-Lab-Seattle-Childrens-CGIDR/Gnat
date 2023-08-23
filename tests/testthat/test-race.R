@@ -68,9 +68,27 @@ test_that("Sample Score Works", {
         nrow=3,
         ncol=4
     )
-    smallKnownScores <- c(0.9354143, 1.5411035, 0.9354143, 0.6123724)
+    smallKnownScores <- c(1./3, -1./9, 1./3, 1./3)
     smallSampleScores <- raceSampleScore(smallTestMat)
     expect_equal(smallSampleScores, smallKnownScores,tolerance=1e4)
+    # Set seed for datagen
+    set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+    testvals <- datagenGenerate(ngenesOrdered = 15,
+                                ngenesTotal = 30, nsamplesOrdered = 10,
+                                nsamplesTotal = 20, dist = rnorm,
+                                reorderGenes=TRUE)
+    testExpression <- testvals$expression
+    orderedGenes <- testvals$orderedGenes
+    orderedSamples <- testvals$orderedSamples
+    unorderedSamples <- setdiff(seq_len(20), orderedSamples)
+    sampleScores <- raceSampleScore(
+        testExpression[orderedGenes, orderedSamples])
+    expect_length(sampleScores, length(orderedSamples))
+    expect_equal(sampleScores, rep(1., length(orderedSamples)))
+    unorderedSampleScores <- raceSampleScore(
+        testExpression[orderedGenes, unorderedSamples]
+    )
+    expect_true(all(unorderedSampleScores<1.))
 })
 
 
@@ -184,25 +202,4 @@ test_that("Compare Phenotypes Works", {
         expect_equal(abs(elem$p1Score-elem$p2Score), elem$absoluteDifference)
         expect_lte(elem$pValue, 0.05)
     }
-})
-
-test_that("CRANCE Sample score works",{
-    # Set seed for datagen
-    set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-    testvals <- datagenGenerate(ngenesOrdered = 15,
-                                ngenesTotal = 30, nsamplesOrdered = 10,
-                                nsamplesTotal = 20, dist = rnorm,
-                                reorderGenes=TRUE)
-    testExpression <- testvals$expression
-    orderedGenes <- testvals$orderedGenes
-    orderedSamples <- testvals$orderedSamples
-    unorderedSamples <- setdiff(seq_len(20), orderedSamples)
-    sampleScores <- raceSampleScore(
-        testExpression[orderedGenes, orderedSamples])
-    expect_length(sampleScores, length(orderedSamples))
-    expect_equal(sampleScores, rep(0, length(orderedSamples)))
-    unorderedSampleScores <- raceSampleScore(
-        testExpression[orderedGenes, unorderedSamples]
-    )
-    expect_true(all(unorderedSampleScores>0))
 })
