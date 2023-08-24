@@ -85,9 +85,31 @@ test_that("Score Function Works",{
 })
 
 test_that("Gene Score Works", {
-
+    set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+    testvals <- datagenGenerate(ngenesOrdered = 10,
+                                ngenesTotal = 10, nsamplesOrdered = 10,
+                                nsamplesTotal = 20, dist = rnorm,
+                                reorderGenes=TRUE)
+    testExpression <- testvals$expression
+    orderedGenes <- testvals$orderedGenes
+    orderedSamples <- testvals$orderedSamples
+    unorderedSamples <- setdiff(seq_len(20), orderedSamples)
+    orderedExpression <- testExpression[orderedGenes, orderedSamples]
+    unorderedExpression <- testExpression[orderedGenes, unorderedSamples]
+    geneEntropyResOrdered <- inferGeneEntropy(orderedExpression)
+    geneEntropyResUnordered <- inferGeneEntropy(unorderedExpression)
+    expect_length(geneEntropyResOrdered, length(orderedGenes))
+    expect_length(geneEntropyResUnordered, length(orderedGenes))
+    smallTestMat <- matrix(c(1,2,3,
+                             2,1,3,
+                             1,2,3,
+                             3,2,1,
+                             1,2,3), nrow=3)
+    smallTestRes <- inferGeneEntropy(smallTestMat)
+    expect_length(smallTestRes, nrow(smallTestMat))
+    expect_equal(smallTestRes, c(1.3709506, 0.7219281, 0.7219281),
+                 tolerance = 1e-5)
 })
-
 
 test_that("Bootstrap Score Works", {
     # Set seed for cluster

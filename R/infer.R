@@ -138,6 +138,15 @@ matrixEntropy <- function(mat, margin = 1) {
 #'
 #' @examples
 inferScoreFunction <- function(rankMatrix){
+    ## Defining these internally to this function so that they will
+    ## work with BiocParallel
+    vectorEntropy <- function(vec){
+        t <- table(vec)/length(vec)
+        -sum(t*log2(t))
+    }
+    matrixEntropy <- function(mat, margin = 1) {
+        apply(mat, MARGIN = margin, vectorEntropy)
+    }
     mean(matrixEntropy(rankMatrix))
 }
 
