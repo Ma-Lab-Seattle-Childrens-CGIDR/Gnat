@@ -7,7 +7,7 @@
 inferGeneEntropy(filteredExpression)
 }
 \arguments{
-\item{expression}{Numeric matrix representing gene expression, with
+\item{filteredExpression}{Numeric matrix representing gene expression, with
 rows representing genes in the network and columns representing samples
 in the phenotype.}
 }

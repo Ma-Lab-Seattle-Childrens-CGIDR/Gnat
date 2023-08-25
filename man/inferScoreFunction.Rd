@@ -5,7 +5,7 @@
 \title{Function to score a rank matrix using the INFER method, the average
 information entropy of genes within the network}
 \usage{
-inferScoreFunction(filteredExpression)
+inferScoreFunction(rankMatrix)
 }
 \arguments{
 \item{rankMatrix}{Numeric matrix, a matrix where each value represents

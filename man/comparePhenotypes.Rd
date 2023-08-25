@@ -8,7 +8,7 @@ list of gene networks}
 comparePhenotypes(
   expression,
   geneNetworkList,
-  phenoytpe1,
+  phenotype1,
   phenotype2,
   rankFun,
   scoreFun,
@@ -24,6 +24,9 @@ representing genes, and columns representing samples}
 
 \item{geneNetworkList}{List of index vectors, each vector representing the
 indices of a different gene networks}
+
+\item{phenotype1, phenotype2}{Index vectors, representing the indices of the
+phenotypes in the expression matrix}
 
 \item{rankFun}{Function for creating a rank matrix, should take a matrix of
 dim (gene, sample) as input, and return a rank matrix, with samples as the
@@ -41,9 +44,6 @@ replacement}
 
 \item{asFrame}{Boolean, whether the return should be a data.frame (TRUE),
 or a named list (FALSE)}
-
-\item{phenotype1, phenotype2}{Index vectors, representing the indices of the
-phenotypes in the expression matrix}
 }
 \value{
 Either a data.frame, or a named list depending on the asFrame
