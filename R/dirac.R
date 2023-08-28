@@ -71,6 +71,9 @@ diracRankVector <- function(expressionVector, expressionLength=NULL,
         matrixIndex <- lower.tri(matrix(1, nrow = expressionLength,
                                         ncol = expressionLength,))
     }
+    if(expressionLength==0){
+        stop("Expression vector must not be empty")
+    }
     expressionMatrix <- matrix(expressionVector, nrow = expressionLength,
                                ncol = expressionLength, byrow=TRUE)
     ((expressionMatrix-t(expressionMatrix)) < 0)[matrixIndex]
@@ -142,12 +145,15 @@ diracRankMatchingScore <- function(rankVector, rankTemplate){
     if(length(rankVector)!=length(rankTemplate)){
         stop("rankVector and rankTemplate must be same length")
     }
+    if(length(rankVector)==0){
+        stop("Neither rankVector, nor rankTemplate can be empty")
+    }
     mean(rankVector==rankTemplate)
 }
 
 #' Find rank matching score across samples
 #'
-#' `dirac.rank_matching_score.vector` finds the rank matching score between each
+#' Finds the rank matching score between each
 #'    sample in a rank_matrix, and a rank_template
 #'
 #' @param rank_matrix Boolean matrix, columns represent each samples rank
@@ -186,18 +192,29 @@ diracScoreFunction <- function(rankMatrix){
     rankTemplate <- (rowMeans(rankMatrix) > 0.5)
     ## Implemented this way so that it works with BiocParallel on snow
     ## clusters
-    mean(diracMatrixMatchingScore <- function(rankMatrix, rankTemplate){
+    mean(
         apply(rankMatrix, 2,
               function(rankVector, rankTemplate) mean(rankVector==rankTemplate),
               rankTemplate=rankTemplate)
-    })
+    )
 }
 
 
 # Sample Score ------------------------------------------------------------
 
-diracSampleScore <- function(rankMatrix){
-    rankTemplate <- (rowMeans(rankMatrix) > 0.5)
+#' Compute Sample-wise entropy using DIRAC
+#'
+#' @param filteredExpression Numeric matrix, representing gene expression,
+#'      with rows representing genes in the network of interest, and columns
+#'      representing samples within a phenotype
+#'
+#' @return Numeric vector, DIRAC Rank Matching Score for each sample
+#' @export
+#'
+#' @examples
+diracSampleScore <- function(filteredExpression){
+    rankMatrix <- diracRankFunction(filteredExpression = filteredExpression)
+    rankTemplate <- diracRankTemplate(rankMatrix)
     diracMatrixMatchingScore(rankMatrix=rankMatrix, rankTemplate=rankTemplate)
 }
 
@@ -222,17 +239,14 @@ diracSampleScore <- function(rankMatrix){
 #' @examples
 #' # example code
 #' @export
-diracClassifier <- function(expression, phenotype1, phenotype2, geneIndex,
-                             names = c("phenotype1", "phenotype2")) {
+diracClassifier <- function(expression, phenotype1, phenotype2, geneIndex) {
     # get the rank matrices for the expression matrix
     p1RankMatrix <- diracRankFunction(expression[geneIndex, phenotype1])
     p2RankMatrix <- diracRankFunction(expression[geneIndex, phenotype2])
     # Get the rank templates for each of the phenotypes
     p1RankTemplate <- diracRankTemplate(p1RankMatrix)
     p2RankTemplate <- diracRankTemplate(p2RankMatrix)
-    # Create an intermediate function which returns a vector of the rank
-    #   matching score differences from an expression matrix
-    rankMatchingDiff <- function(expression) {
+    function(expression) {
         # Get the rank matrix
         rankMatrix <- diracRankFunction(expression[geneIndex, ])
         # Get the p1 matching score
@@ -245,11 +259,7 @@ diracClassifier <- function(expression, phenotype1, phenotype2, geneIndex,
             p2RankTemplate
         )
         # Return the difference between the two
-        p1MatchingScore - p2MatchingScore
-    }
-    function(expression) {
-        # Get the rank matching score difference
-        rmd <- rankMatchingDiff(expression)
+        rmd <- p1MatchingScore - p2MatchingScore
         (rmd > 0)
     }
 
@@ -302,6 +312,8 @@ diracRankDifferenceScore <- function(expression, phenotype1, phenotype2,
         p1RankTemplate
     ) -
         diracMatrixMatchingScore(p2RankMatrix, p2RankTemplate)
+    names(p1RankDifference) <- phenotype1
+    names(p2RankDifference) <- phenotype2
     list(p1RankDifference, p2RankDifference)
 }
 
@@ -387,20 +399,18 @@ diracClassificationRate <- function(geneIndex, expression, phenotype1,
 #' @export
 diracClassificationRateCompare <- function(expression, phenotype1,
                                            phenotype2, geneIndexList,
-                                           BPPARAM = bpparam(),
                                            asFrame = FALSE) {
 
     geneIndexList <- ensureNamed(geneIndexList)
     res <- unlist(
-        bplapply(geneIndexList, diracClassificationRate,
+        lapply(geneIndexList, diracClassificationRate,
                  expression = expression, phenotype1 = phenotype1,
-                 phenotype2 = phenotype2,
-                 mc.cores = cores, BPPARAM = BPPARAM
+                 phenotype2 = phenotype2
         )
     )
     if (!asFrame) {
         # Rename the results based on the names of the gene_index list arg
-        names(res) <- names(geneIndex)
+        names(res) <- names(geneIndexList)
         # Return the renamed results
         return(res)
     }
@@ -433,18 +443,14 @@ diracClassificationRateBest <-
     function(expression,
              phenotype1,
              phenotype2,
-             gene_index,
-             parallel = TRUE,
-             cores = 4) {
+             gene_index) {
         names(which.max(
             diracClassificationRateCompare(
                 expression,
                 phenotype1,
                 phenotype2,
                 gene_index,
-                parallel,
-                cores,
-                as.frame = FALSE
+                asFrame = FALSE
             )
         ))
     }
