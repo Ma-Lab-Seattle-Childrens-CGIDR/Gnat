@@ -112,3 +112,38 @@ test_that("Drop out works", {
     num_drops <- sum((expression - res) != 0)
     expect_equal(num_drops, 3)
 })
+
+test_that("Generating a Summarized Experiment Object Works",{
+    NGENESORDERED <- 10
+    NGENESTOTAL <- 20
+    NSAMPLESORDERED <- 15
+    NSAMPLESTOTAL <- 30
+    DIST <- rnorm
+    seRes <- generateSummarizedExperiment(ngenesOrdered=NGENESORDERED,
+                                          ngenesTotal=NGENESTOTAL,
+                                          nsamplesOrdered=NSAMPLESORDERED,
+                                          nsamplesTotal=NSAMPLESTOTAL,
+                                          dist=DIST,reorderGenes=TRUE)
+    se <- seRes$seObject
+    orderedGenes <- seRes$orderedGenes
+    unorderedGenes <- seRes$unorderedGenes
+    orderedSamples <- seRes$orderedSamples
+    unorderedSamples <- seRes$unorderedSamples
+    orderedGeneNames <- seRes$orderedGeneNames
+    unorderedGeneNames <- seRes$unorderedGeneNames
+    orderedSampleNames <- seRes$orderedSampleNames
+    unorderedSampleNames <- seRes$unorderedSampleNames
+
+    expect_s4_class(se, "SummarizedExperiment")
+    expect_length(orderedGenes, NGENESORDERED)
+    expect_length(unorderedGenes, NGENESTOTAL-NGENESORDERED)
+    expect_length(orderedSamples, NSAMPLESORDERED)
+    expect_length(unorderedSamples, NSAMPLESTOTAL-NSAMPLESORDERED)
+    expect_length(orderedGeneNames, NGENESORDERED)
+    expect_length(unorderedGeneNames, NGENESTOTAL-NGENESORDERED)
+    expect_length(orderedSampleNames, NSAMPLESORDERED)
+    expect_length(unorderedSampleNames, NSAMPLESTOTAL-NSAMPLESORDERED)
+
+    expect_no_error(se[orderedGenes, orderedSamples])
+    expect_no_error(se[,se$phenotypeNum==1])
+})

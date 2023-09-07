@@ -58,6 +58,99 @@ datagenGenerate <- function(ngenesOrdered, ngenesTotal, nsamplesOrdered,
 }
 
 
+
+# Summarized Experiment Generator -----------------------------------------
+#' Generates a summarized experiment object with gene expression data, which
+#' has an ordered subnetwork
+#'
+#' @param ngenesOrdered Integer, number of genes in the ordered sub network.
+#' @param ngenesTotal Integer, total number of genes desired.
+#' @param nsamplesOrdered Integer, number of samples in the ordered phenotype.
+#' @param nsamplesTotal Integer, total number of samples
+#' @param dist Function, distribution to use for generating data. It is passed
+#'    ngenes (for number of values to generate), and any other keyword
+#'    arguments. Must return a numeric vector.
+#' @param reorderGenes Boolean, whether the order of genes within the ordered
+#'   sub network should be shuffled. If TRUE, the order of the genes in the
+#'   network will be randomly reshuffled. If FALSE, the genes within the network
+#'   will always have their expression values increase with increasing row
+#'   index.
+#' @param ... Keyword arguments, passed to the dist function
+#'
+#' @return Named list with:
+#'      seObject: The generated summarized experiment, with
+#'          colData:
+#'              sampleNames, phenotypeNum, and phenotypeStr
+#'          rowData:
+#'              geneNames, networkNum, netowrkStr
+#'      orderedGenes: A numeric vector with the indices of the ordered genes
+#'      orderedSamples: A numeric vector with the indices of the ordered samples
+#'      orderedGeneNames: A character vector with the ordered gene names
+#'      orderedSampleNames: A character vector with the ordered sample names
+#'      unorderedGenes: A numeric vector with the indices of the unordered genes
+#'      unorderedSamples: A numeric vector with the indices of the unorrdered
+#'          samples
+#'      unorderedGeneNames: A character vector with the unordered gene names
+#'      unorderedSampleNames: A character vector with the unordered sample
+#'          names
+#' @export
+#'
+#' @examples
+generateSummarizedExperiment <- function(ngenesOrdered, ngenesTotal,
+                                         nsamplesOrdered, nsamplesTotal,
+                                         dist, reorderGenes=FALSE,
+                                         genePrefix="g_",
+                                         samplePrefix="s_", ...){
+    expData <- datagenGenerate(ngenesOrdered = ngenesOrdered,
+                               ngenesTotal = ngenesTotal,
+                               nsamplesOrdered = nsamplesOrdered,
+                               nsamplesTotal = nsamplesTotal,
+                               dist=dist, reorderGenes = reorderGenes, ...)
+    expression <- expData$expression
+    orderedGenes <- expData$orderedGenes
+    unorderedGenes <- setdiff(1:ngenesTotal, orderedGenes)
+    orderedSamples <- expData$orderedSamples
+    unorderedSamples <- setdiff(1:nsamplesTotal, orderedSamples)
+    geneNames <- vapply(1:ngenesTotal,
+                         function(x) paste(genePrefix, x, sep=""),
+                         character(1))
+    sampleNames <- vapply(1:nsamplesTotal,
+                           function(x) paste(samplePrefix, x, sep=""),
+                           character(1))
+    phenotypeNum <- numeric(nsamplesTotal)
+    phenotypeNum[orderedSamples] <-  1
+    phenotypeNum[unorderedSamples] <- 2
+    phenotypeStr <- character(nsamplesTotal)
+    phenotypeStr[orderedSamples] <- "one"
+    phenotypeStr[unorderedSamples] <- "two"
+    columnDataFrame <- S4Vectors::DataFrame(sampleNames, phenotypeNum,
+                                            phenotypeStr,
+                                            row.names = sampleNames)
+    networkNum <- numeric(ngenesTotal)
+    networkNum[orderedGenes] <- 1
+    networkNum[unorderedGenes] <- 2
+    networkStr <- character(ngenesTotal)
+    networkStr[orderedGenes] <- "one"
+    networkStr[unorderedGenes] <- "two"
+    rowDataFrame <- S4Vectors::DataFrame(geneNames, networkNum, networkStr,
+                                         row.names=geneNames)
+    summarizedExperimentResult <-
+        SummarizedExperiment::SummarizedExperiment(
+            assays=list(geneExpression = expression),
+            rowData = rowDataFrame, colData = columnDataFrame
+        )
+    orderedGeneNames <- geneNames[orderedGenes]
+    orderedSampleNames <- sampleNames[orderedSamples]
+    unorderedGeneNames <- geneNames[unorderedGenes]
+    unorderedSampleNames <- sampleNames[unorderedSamples]
+    list(seObject=summarizedExperimentResult, orderedGenes=orderedGenes,
+         orderedSamples=orderedSamples, orderedGeneNames=orderedGeneNames,
+         orderedSampleNames=orderedSampleNames, unorderedGenes=unorderedGenes,
+         unorderedSamples=unorderedSamples,
+         unorderedGeneNames=unorderedGeneNames,
+         unorderedSampleNames=unorderedSampleNames)
+}
+
 # Main Noise Functions ----------------------------------------------------
 
 #' Perform nswaps on the expression data, and return the result

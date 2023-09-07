@@ -294,6 +294,8 @@ test_that("Dirac Rank Difference Score Works", {
         c(2, 4, 6, 8),
         c(2, 4, 5, 6)
     )
+    names(rankDifferenceScoreExp[[1]]) <- c(1,3,5,7)
+    names(rankDifferenceScoreExp[[2]]) <- c(2,4,6,8)
     expect_equal(rankDifferenceScoreAct, rankDifferenceScoreExp)
 })
 
@@ -317,7 +319,6 @@ test_that("Diract Classification Rate Function",{
     expect_equal(classRateActual, classRateExpected)
 })
 
-
 test_that("Classification rate comparison works", {
     # Create test expression set
     set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
@@ -337,8 +338,6 @@ test_that("Classification rate comparison works", {
         classRateCompareExp
     )
 })
-
-
 
 test_that("Finding Best Classification rate best works", {
     # Create test expression set
