@@ -16,6 +16,8 @@ Imports:
     stats,
     parallel,
     BiocParallel,
+    methods, 
+    base,
     SummarizedExperiment,
     SingleCellExperiment,
     S4Vectors

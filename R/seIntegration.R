@@ -33,9 +33,9 @@
 #'
 #' @examples
 seCrane <- function(seObject, phenotype1, phenotype2, geneNetworkList,
-                    assayName = "count", bootstrapIterations=1000, replace=TRUE,
-                    asFrame=TRUE){
-    .wrapMethod(method=craneComparePhenotypes,
+                    assayName = "counts", bootstrapIterations=1000,
+                    replace=TRUE, asFrame=TRUE){
+    .wrapMethodComparePhenotypes(method=craneComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
                 phenotype2 = phenotype2,
@@ -75,9 +75,9 @@ seCrane <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #'
 #' @examples
 seDirac <- function(seObject, phenotype1, phenotype2, geneNetworkList,
-                    assayName = "count", bootstrapIterations=1000, replace=TRUE,
-                    asFrame=TRUE){
-    .wrapMethod(method=diracComparePhenotypes,
+                    assayName = "counts", bootstrapIterations=1000,
+                    replace=TRUE, asFrame=TRUE){
+    .wrapMethodComparePhenotypes(method=diracComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
                 phenotype2 = phenotype2,
@@ -117,9 +117,9 @@ seDirac <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #'
 #' @examples
 seRace <- function(seObject, phenotype1, phenotype2, geneNetworkList,
-                    assayName = "count", bootstrapIterations=1000, replace=TRUE,
-                    asFrame=TRUE){
-    .wrapMethod(method=raceComparePhenotypes,
+                   assayName = "counts", bootstrapIterations=1000,
+                   replace=TRUE, asFrame=TRUE){
+    .wrapMethodComparePhenotypes(method=raceComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
                 phenotype2 = phenotype2,
@@ -159,9 +159,9 @@ seRace <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #'
 #' @examples
 seInfer <- function(seObject, phenotype1, phenotype2, geneNetworkList,
-                    assayName = "count", bootstrapIterations=1000, replace=TRUE,
-                    asFrame=TRUE){
-    .wrapMethod(method=craneComparePhenotypes,
+                    assayName = "counts", bootstrapIterations=1000,
+                    replace=TRUE, asFrame=TRUE){
+    .wrapMethodComparePhenotypes(method=craneComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
                 phenotype2 = phenotype2,
@@ -175,16 +175,101 @@ seInfer <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 
 
 # By Sample Functions -----------------------------------------------------
-seDiracBySample <- function(){
 
+#' Compute the Sample Wise entropy using DIRAC for a SummarizedExperiment
+#'
+#' @param seObject SummarizedExperiment object used as input, should contain
+#'      an assay with gene expression data, and genes as rownames
+#' @param phenotype1,phenotype2 Index vector describing the location of the
+#'      two phenotypes in the seObject, can be a numeric, character, or logical
+#'      vector
+#' @param phenotypeNames Character vector with names for the phenotypes,
+#'      phenotype1 should be the first entry and phenotype2 should be the
+#'      second
+#' @param geneNetwork Index vector describing the location of the
+#'      gene network in the seObject, can be a numeric, character, or logical
+#'      vector
+#' @param geneNetworkName Name for the gene network
+#' @param assayName Name of the assay containing the gene expression data
+#'
+#' @return SummarizedExperiment object with two columns added to colData,
+#'      one for the entropy of each of the phenotypes
+#' @export
+#'
+#' @examples
+seDiracBySample <- function(seObject, phenotype1, phenotype2,
+                            phenotypeNames=c("phenotype1", "phenotype2"),
+                            geneNetwork, geneNetworkName="gn",
+                            assayName="counts"){
+    .wrapMethodBySample(seObject = seObject, method=diracSampleScore,
+                        methodName = "DIRAC", phenotype1=phenotype1,
+                        phenotype2=phenotype2, phenotypeNames = phenotypeNames,
+                        geneNetwork=geneNetwork,
+                        geneNetworkName=geneNetworkName, assayName=assayName)
 }
 
-seRaceBySample <- function(){
-
+#' Compute the Sample Wise entropy using RACE for a SummarizedExperiment
+#'
+#' @param seObject SummarizedExperiment object used as input, should contain
+#'      an assay with gene expression data, and genes as rownames
+#' @param phenotype1,phenotype2 Index vector describing the location of the
+#'      two phenotypes in the seObject, can be a numeric, character, or logical
+#'      vector
+#' @param phenotypeNames Character vector with names for the phenotypes,
+#'      phenotype1 should be the first entry and phenotype2 should be the
+#'      second
+#' @param geneNetwork Index vector describing the location of the
+#'      gene network in the seObject, can be a numeric, character, or logical
+#'      vector
+#' @param geneNetworkName Name for the gene network
+#' @param assayName Name of the assay containing the gene expression data
+#'
+#' @return SummarizedExperiment object with two columns added to colData,
+#'      one for the entropy of each of the phenotypes
+#' @export
+#'
+#' @examples
+seRaceBySample <- function(seObject, phenotype1, phenotype2,
+                            phenotypeNames=c("phenotype1", "phenotype2"),
+                            geneNetwork, geneNetworkName="gn",
+                            assayName="counts"){
+    .wrapMethodBySample(seObject = seObject, method=raceSampleScore,
+                        methodName = "RACE", phenotype1=phenotype1,
+                        phenotype2=phenotype2, phenotypeNames = phenotypeNames,
+                        geneNetwork=geneNetwork,
+                        geneNetworkName=geneNetworkName, assayName=assayName)
 }
 
-seCraneBySample <- function(){
-
+#' Compute the Sample Wise entropy using CRANE for a SummarizedExperiment
+#'
+#' @param seObject SummarizedExperiment object used as input, should contain
+#'      an assay with gene expression data, and genes as rownames
+#' @param phenotype1,phenotype2 Index vector describing the location of the
+#'      two phenotypes in the seObject, can be a numeric, character, or logical
+#'      vector
+#' @param phenotypeNames Character vector with names for the phenotypes,
+#'      phenotype1 should be the first entry and phenotype2 should be the
+#'      second
+#' @param geneNetwork Index vector describing the location of the
+#'      gene network in the seObject, can be a numeric, character, or logical
+#'      vector
+#' @param geneNetworkName Name for the gene network
+#' @param assayName Name of the assay containing the gene expression data
+#'
+#' @return SummarizedExperiment object with two columns added to colData,
+#'      one for the entropy of each of the phenotypes
+#' @export
+#'
+#' @examples
+seCraneBySample <- function(seObject, phenotype1, phenotype2,
+                           phenotypeNames=c("phenotype1", "phenotype2"),
+                           geneNetwork, geneNetworkName="gn",
+                           assayName="counts"){
+    .wrapMethodBySample(seObject = seObject, method=craneSampleScore,
+                        methodName = "CRANE", phenotype1=phenotype1,
+                        phenotype2=phenotype2, phenotypeNames = phenotypeNames,
+                        geneNetwork=geneNetwork,
+                        geneNetworkName=geneNetworkName, assayName=assayName)
 }
 
 
@@ -192,13 +277,52 @@ seCraneBySample <- function(){
 
 # Helper Functions --------------------------------------------------------
 
-.wrapMethod <- function(
-        method,
+.wrapMethodBySample <- function(seObject, method, methodName, phenotype1,
+                                phenotype2, phenotypeNames, geneNetwork,
+                                geneNetworkName, assayName="counts"){
+    # Ensure that seObject is a SummarizedExperiment object
+    if(!methods::is(seObject, "SummarizedExperiment")){
+        stop("First argument must be a SummarizedExperiment object or subclass")
+    }
+    # Copy colData, it will be modified, and then the colData will be set
+    # to the modified value
+    columnData <- SummarizedExperiment::colData(seObject)
+    # Get dims of the seObject
+    dims <- SummarizedExperiment::dim(seObject)
+    p1Index <- .checkPhenotype(seObject=seObject, phenotype=phenotype1)
+    p2Index <- .checkPhenotype(seObject=seObject, phenotype=phenotype2)
+    geneIndex <- .checkNetwork(network = geneNetwork,
+                               numRows = dims[[1]],
+                               rowNames =
+                                   SummarizedExperiment::rownames(seObject))
+    # Create names for the additional columns being added to the colData
+    p1ColName <- paste(methodName, geneNetworkName, phenotypeNames[1],
+                       "entropy", sep="_")
+    p2ColName <- paste(methodName, geneNetworkName, phenotypeNames[2],
+                       "entropy", sep="_")
+    # Get expression values for the two phenotypes
+    p1FilteredExpression <- assays(seObject)[[assayName]][geneIndex, p1Index]
+    p2FilteredExpression <- assays(seObject)[[assayName]][geneIndex, p2Index]
+    # Get entropy values
+    p1Entropy <- method(p1FilteredExpression)
+    p2Entropy <- method(p2FilteredExpression)
+    # Update the coldata to include the columns for entropy
+    columnData[p1ColName] <- NA
+    columnData[p1Index, p1ColName] <- p1Entropy
+    columnData[p2ColName] <- NA
+    columnData[p2Index, p2ColName] <- p2Entropy
+    # Update the SummarizedExperiment object with
+    colData(seObject) <- columnData
+    seObject
+}
+
+.wrapMethodComparePhenotypes <- function(
         seObject,
+        method,
         phenotype1,
         phenotype2,
         geneNetworkList,
-        assayName = "count",
+        assayName = "counts",
         bootstrapIterations = 1000,
         replace = TRUE,
         asFrame = TRUE
@@ -226,9 +350,9 @@ seCraneBySample <- function(){
 
 
 .checkArgs <- function(seObject,phenotype1, phenotype2, geneNetworks){
-    if(!is(seObject, "SummarizedExperiment")){
+    if(!methods::is(seObject, "SummarizedExperiment")){
         # This will not be called with subclasses (i.e. RangedExperiment)
-        stop("First argument must be a SummarizedExperiment object")
+        stop("First argument must be a SummarizedExperiment object or subclass")
     }
     p1Index <- .checkPhenotype(seObject, phenotype1)
     p2Index <- .checkPhenotype(seObject, phenotype2)
