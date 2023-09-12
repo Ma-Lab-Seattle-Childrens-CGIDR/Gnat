@@ -9,7 +9,6 @@ diracClassificationRateCompare(
   phenotype1,
   phenotype2,
   geneIndexList,
-  BPPARAM = bpparam(),
   asFrame = FALSE
 )
 }

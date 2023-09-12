@@ -55,6 +55,7 @@ inferBootstrapScore <- function(expression, geneNetwork, phenotype1,
 #' @export
 #'
 #' @examples
+#' @include bootstrap_score.R
 inferComparePhenotypes <- function(expression, geneNetworkList,
                                    phenotype1, phenotype2,
                                    bootstrapIterations=1000,

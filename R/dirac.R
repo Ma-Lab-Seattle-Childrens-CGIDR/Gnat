@@ -7,7 +7,25 @@
 # https://doi.org/10.1371/journal.pcbi.1000792.
 
 # Bootstrap Score ---------------------------------------------------------
-
+#' Find a p-value for the difference in entropy between two phenotypes according
+#' to the DIRAC method using a bootstrapped distribution
+#'
+#' @param expression Numeric matrix of gene expression, with rows representing
+#'    genes, and columns representing samples.
+#' @param phenotype1,phenotype2 Index vectors, representing the indices of the
+#'    phenotypes in the expression matrix
+#' @param geneNetwork Index Vector, representing the indices of the genes in the
+#'    gene network
+#' @param bootstrapIterations Integer, number of iterations to perform when
+#'    creating the null distribution
+#' @param replace Boolean, whether sampling the phenotypes should be done with
+#'    replacement
+#'
+#' @return Named list of results, specifically p1Score, p2Score,
+#'    absoluteDifference, and pValue
+#' @export
+#'
+#' @examples
 diracBootstrapScore <- function(expression,
                                 geneNetwork,
                                 phenotype1,
@@ -25,6 +43,32 @@ diracBootstrapScore <- function(expression,
 
 
 # Compare Phenotypes ------------------------------------------------------
+
+#' Compare the entropy difference between phenotypes for a list of gene
+#' networks using the DIRAC method
+#'
+#' @param expression Numeric matrix of gene expression values, rows
+#'    representing genes, and columns representing samples
+#' @param geneNetworkList List of index vectors, each vector representing the
+#'    indices of a different gene networks
+#' @param phenotype1,phenotype2 Index vectors, representing the indices of the
+#'    phenotypes in the expression matrix
+#' @param bootstrapIterations Integer, number of iterations to perform when
+#'    creating the null distribution
+#' @param replace Boolean, whether sampling the phenotypes should be done with
+#'    replacement
+#' @param asFrame Boolean, whether the return should be a data.frame (TRUE),
+#'    or a named list (FALSE)
+#'
+#' @return Either a data.frame, or a named list depending on the asFrame
+#'    parameter. In the data.frame form, with columns for geneNetwork, p1Score,
+#'    p2Score, absoluteDifference, and pValue. The list return is named
+#'    according to the names in the geneNetworkList parameter, with each value
+#'    being a named list with p1Score, p2Score, absoluteDifference, and pValue.
+#' @export
+#'
+#' @examples
+#' @include bootstrap_score.R
 diracComparePhenotypes <- function(expression,
                                    geneNetworkList,
                                    phenotype1,
@@ -217,56 +261,6 @@ diracSampleScore <- function(filteredExpression){
     rankTemplate <- diracRankTemplate(rankMatrix)
     diracMatrixMatchingScore(rankMatrix=rankMatrix, rankTemplate=rankTemplate)
 }
-
-
-
-# Phenotype Classifier ----------------------------------------------------------
-
-#' Creates a phenotype classifier based on DIRAC
-#'
-#' @param expression Numeric matrix of gene expression values, rows are genes
-#'    columns are samples
-#' @param phenotype1,phenotype2 Numeric vectors with indices for each of the
-#'    phenotypes
-#' @param gene_index Numeric vector of indices for the genes within the gene
-#'    network being used for classification
-#' @param names optional Character vector with the desired names for the
-#'      phenotypes
-#'
-#' @returns A function with expression argument, which will return a boolean
-#'      vector, with TRUE for the samples predicted to be phenotype1 and FALSE
-#'      for the samples predicted to be phenotype2
-#' @examples
-#' # example code
-#' @export
-diracClassifier <- function(expression, phenotype1, phenotype2, geneIndex) {
-    # get the rank matrices for the expression matrix
-    p1RankMatrix <- diracRankFunction(expression[geneIndex, phenotype1])
-    p2RankMatrix <- diracRankFunction(expression[geneIndex, phenotype2])
-    # Get the rank templates for each of the phenotypes
-    p1RankTemplate <- diracRankTemplate(p1RankMatrix)
-    p2RankTemplate <- diracRankTemplate(p2RankMatrix)
-    function(expression) {
-        # Get the rank matrix
-        rankMatrix <- diracRankFunction(expression[geneIndex, ])
-        # Get the p1 matching score
-        p1MatchingScore <- diracMatrixMatchingScore(
-            rankMatrix,
-            p1RankTemplate
-        )
-        p2MatchingScore <- diracMatrixMatchingScore(
-            rankMatrix,
-            p2RankTemplate
-        )
-        # Return the difference between the two
-        rmd <- p1MatchingScore - p2MatchingScore
-        (rmd > 0)
-    }
-
-}
-
-
-
 
 
 # Gene Network Classification Comparison ----------------------------------

@@ -56,6 +56,7 @@ craneBootstrapScore <- function(expression, geneNetwork, phenotype1,
 #' @export
 #'
 #' @examples
+#' @include bootstrap_score.R
 craneComparePhenotypes <- function(expression, geneNetworkList,
                                    phenotype1, phenotype2,
                                    bootstrapIterations=1000,
@@ -84,6 +85,7 @@ craneComparePhenotypes <- function(expression, geneNetworkList,
 #' testMat <- matrix(runif(20), ncol=4, nrow=5)
 #' print(craneRankFunction(testMat))
 #' print(craneRankFunction(testMat, margin=1))
+#' @include utils.R
 craneRankFunction <- function(filteredExpression){
     simpleRank(filteredExpression, margin=2)
 }
@@ -103,8 +105,8 @@ craneRankFunction <- function(filteredExpression){
 #'
 #' @examples
 craneScoreFunction <- function(rankMatrix){
-    centroid <- apply(rankMatrix, MARGIN=1, mean, na.rm=TRUE)
-    mean(sqrt(apply((rankMatrix-centroid)^2, MARGIN=2, sum)))
+    centroid <- rowMeans(rankMatrix, na.rm=TRUE)
+    mean(sqrt(colSums((rankMatrix-centroid)^2)))
 }
 
 
@@ -121,6 +123,6 @@ craneScoreFunction <- function(rankMatrix){
 #' @examples
 craneSampleScore <- function(filteredExpression){
     rankMatrix <- craneRankFunction(filteredExpression = filteredExpression)
-    centroid <- apply(rankMatrix, MARGIN=1, mean, na.rm=TRUE)
+    centroid <- rowMeans(rankMatrix, na.rm=TRUE)
     sqrt(apply((rankMatrix-centroid)^2, MARGIN=2, sum))
 }

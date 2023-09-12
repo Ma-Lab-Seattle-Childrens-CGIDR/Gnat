@@ -16,7 +16,7 @@ vector}
 Numeric vector of rank matching scores
 }
 \description{
-\code{dirac.rank_matching_score.vector} finds the rank matching score between each
+Finds the rank matching score between each
 sample in a rank_matrix, and a rank_template
 }
 \examples{

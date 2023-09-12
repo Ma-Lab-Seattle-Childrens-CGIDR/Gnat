@@ -22,5 +22,20 @@ Imports:
     SingleCellExperiment,
     S4Vectors
 Suggests: 
-    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 Config/testthat/edition: 3
+VignetteBuilder: knitr
+Collate: 
+    'Gnat-package.R'
+    'utils.R'
+    'bootstrap_score.R'
+    'infer.R'
+    'dirac.R'
+    'race.R'
+    'crane.R'
+    'classification.R'
+    'seIntegration.R'
+    'compareRankEntropy.R'
+    'datagen.R'

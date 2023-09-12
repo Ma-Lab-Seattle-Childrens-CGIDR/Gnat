@@ -56,6 +56,7 @@ raceBootstrapScore <- function(expression, geneNetwork, phenotype1,
 #' @export
 #'
 #' @examples
+#' @include bootstrap_score.R
 raceComparePhenotypes <- function(expression, geneNetworkList, phenotype1,
                                   phenotype2, bootstrapIterations=1000,
                                   replace=TRUE, asFrame=TRUE,

@@ -1,3 +1,6 @@
+# Ensure that utils.R is loaded earlier
+#' @include utils.R
+
 # Main Function -----------------------------------------------------------
 #' Compute the pValue for the difference in entropy between two phenotypes for
 #' list of gene networks
@@ -196,7 +199,8 @@ scoreShuffled <-
 #'
 #' @return Named list of results, specifically p1Score, p2Score,
 #'    absoluteDifference, and pValue
-#' @importFrom BiocParallel bplapply SnowParam SerialParam MulticoreParam
+#'
+#' @importFrom BiocParallel bplapply SnowParam SerialParam MulticoreParam bpparam
 #' @export
 #'
 #' @examples

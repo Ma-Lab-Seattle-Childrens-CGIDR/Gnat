@@ -1,6 +1,8 @@
-## Include the required packages before loading this one
-#' @include race.R crane.R dirac.R infer.R
-## Import needed Summarized Experiment Functions
+## File includes the methods for performing the rank entropy phenotype
+## comparison, and the sample wise entropy calculation with
+## SummarizedExperiment objects
+
+
 # Phenotype Comparison Function -------------------------------------------
 
 
@@ -32,9 +34,10 @@
 #' @export
 #'
 #' @examples
+#' @include crane.R
 seCrane <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                     assayName = "counts", bootstrapIterations=1000,
-                    replace=TRUE, asFrame=TRUE){
+                    replace=TRUE, asFrame=TRUE, BPPARAM=bpparam()){
     .wrapMethodComparePhenotypes(method=craneComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
@@ -43,7 +46,8 @@ seCrane <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                 assayName = assayName,
                 bootstrapIterations = bootstrapIterations,
                 replace = replace,
-                asFrame = asFrame)
+                asFrame = asFrame,
+                BPPARAM=BPPARAM)
 }
 
 #' Perform Phenotype Comparison using the DIRAC method on a Summarized
@@ -74,9 +78,10 @@ seCrane <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #' @export
 #'
 #' @examples
+#' @include dirac.R
 seDirac <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                     assayName = "counts", bootstrapIterations=1000,
-                    replace=TRUE, asFrame=TRUE){
+                    replace=TRUE, asFrame=TRUE, BPPARAM=bpparam()){
     .wrapMethodComparePhenotypes(method=diracComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
@@ -85,7 +90,8 @@ seDirac <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                 assayName = assayName,
                 bootstrapIterations = bootstrapIterations,
                 replace = replace,
-                asFrame = asFrame)
+                asFrame = asFrame,
+                BPPARAM=BPPARAM)
 }
 
 #' Perform Phenotype Comparison using the RACE method on a Summarized
@@ -116,9 +122,10 @@ seDirac <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #' @export
 #'
 #' @examples
+#' @include race.R
 seRace <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                    assayName = "counts", bootstrapIterations=1000,
-                   replace=TRUE, asFrame=TRUE){
+                   replace=TRUE, asFrame=TRUE, BPPARAM=bpparam()){
     .wrapMethodComparePhenotypes(method=raceComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
@@ -127,7 +134,8 @@ seRace <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                 assayName = assayName,
                 bootstrapIterations = bootstrapIterations,
                 replace = replace,
-                asFrame = asFrame)
+                asFrame = asFrame,
+                BPPARAM=BPPARAM)
 }
 
 #' Perform Phenotype Comparison using the INFER method on a Summarized
@@ -158,9 +166,10 @@ seRace <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #' @export
 #'
 #' @examples
+#' @include infer.R
 seInfer <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                     assayName = "counts", bootstrapIterations=1000,
-                    replace=TRUE, asFrame=TRUE){
+                    replace=TRUE, asFrame=TRUE, BPPARAM=bpparam()){
     .wrapMethodComparePhenotypes(method=craneComparePhenotypes,
                 seObject = seObject,
                 phenotype1 = phenotype1,
@@ -169,7 +178,8 @@ seInfer <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                 assayName = assayName,
                 bootstrapIterations = bootstrapIterations,
                 replace = replace,
-                asFrame = asFrame)
+                asFrame = asFrame,
+                BPPARAM=BPPARAM)
 }
 
 
@@ -325,7 +335,8 @@ seCraneBySample <- function(seObject, phenotype1, phenotype2,
         assayName = "counts",
         bootstrapIterations = 1000,
         replace = TRUE,
-        asFrame = TRUE
+        asFrame = TRUE,
+        BPPARAM=bpparam()
 ){
     args <- .checkArgs(seObject, phenotype1, phenotype2, geneNetworkList)
     # Unpack args
@@ -344,7 +355,8 @@ seCraneBySample <- function(seObject, phenotype1, phenotype2,
         phenotype2 = p2Index,
         bootstrapIterations = bootstrapIterations,
         replace = replace,
-        asFrame = asFrame
+        asFrame = asFrame,
+        BPPARAM=bpparam()
     )
 }
 

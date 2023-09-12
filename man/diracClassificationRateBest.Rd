@@ -4,14 +4,7 @@
 \alias{diracClassificationRateBest}
 \title{Compare classification rate for different gene networks}
 \usage{
-diracClassificationRateBest(
-  expression,
-  phenotype1,
-  phenotype2,
-  gene_index,
-  parallel = TRUE,
-  cores = 4
-)
+diracClassificationRateBest(expression, phenotype1, phenotype2, gene_index)
 }
 \arguments{
 \item{expression}{Numeric matrix, represents gene expression, rows are genes
