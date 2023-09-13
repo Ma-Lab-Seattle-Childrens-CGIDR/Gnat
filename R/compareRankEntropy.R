@@ -1,7 +1,6 @@
 # File includes main method for comparing two phenotypes using the rank
 # entropy methods
 
-
 # Main Function -----------------------------------------------------------
 #' Compare Phenotypes using Rank Entropy Methods
 #'
@@ -42,7 +41,7 @@
 #' @include seIntegration.R
 compareRankEntropy <- function(expression,
                               method =
-                                  c("CRANE", "DIRAC", "INFER", "RACE"),
+                                  c("DIRAC", "RACE", "CRANE","INFER"),
                               phenotype1,
                               phenotype2,
                               geneNetworkList,
@@ -86,77 +85,5 @@ compareRankEntropy <- function(expression,
                    replace=replace,
                    asFrame=asFrame,
                    BPPARAM=BPPARAM)
-}
-
-
-
-# Helper Functions --------------------------------------------------------
-.convertPhenotype <- function(phenotype, expressionMatrix){
-    numCols <- dim(expressionMatrix)[2]
-    if(is.logical(phenotype)){
-        if(length(phenotype)==numCols){
-            pIndex <- seq(numCols)[phenotype]
-            return(pIndex)
-        } else {
-            stop("If phenotype is logical, must be same length as",
-                 " columns of expression matrix")
-        }
-    }
-    if(is.numeric(phenotype)){
-        if(!(max(phenotype)<=numCols)){
-            stop("Phenotype index out of range")
-        }
-        return(phenotype)
-    }
-    columnNames <- colnames(expressionMatrix)
-    if(is.character(phenotype)){
-        if(all(phenotype %in% columnNames)){
-            pIndex <- match(phenotype, colNames)
-            return(pIndex)
-        } else {
-            stop(paste("Couldn't find all phenotype entries in expression ",
-                       "matrix. Missing: ",
-                       setdiff(phenotype, columnNames)))
-        }
-    }
-    stop(paste("Couldn't Parse Phenotype, should be logical, character, ",
-               "or numeric vector"))
-}
-
-.convertNetwork <- function(geneNetwork, expressionMatrix){
-    numRows <- dim(expressionMatrix)[1]
-    if(is.logical(geneNetwork)){
-        if(length(geneNetwork)==numRows){
-            gIndex <- seq(numRows)[geneNetwork]
-            return(gIndex)
-        } else {
-            stop(paste("If Gene Network is logical, must be same length as",
-                       " rows of expression matrix"))
-        }
-    }
-    if(is.numeric(geneNetwork)){
-        if(!(max(geneNetwork)<=numRows)){
-            stop("Gene Network index out of range")
-        }
-        return(geneNetwork)
-    }
-    rowNames <- colnames(expressionMatrix)
-    if(is.character(geneNetwork)){
-        if(all(geneNetwork %in% rowNames)){
-            gIndex <- match(geneNetwork, colNames)
-            return(gIndex)
-        } else {
-            stop(paste("Couldn't find all gene network entries in expression ",
-                       "matrix. Missing: ",
-                       setdiff(geneNetwork, rowNames)))
-        }
-    }
-    stop(paste("Couldn't parse gene network, should be logical, character, ",
-               "or numeric vector"))
-}
-
-.convertNetworkList <- function(geneNetworkList, expressionMatrix){
-    geneNetworkList <- ensureNamed(geneNetworkList)
-    lapply(geneNetworkList, .convertNetwork, expressionMatrix=expressionMatrix)
 }
 

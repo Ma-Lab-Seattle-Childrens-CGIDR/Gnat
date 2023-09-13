@@ -356,54 +356,10 @@ seCraneBySample <- function(seObject, phenotype1, phenotype2,
         bootstrapIterations = bootstrapIterations,
         replace = replace,
         asFrame = asFrame,
-        BPPARAM=bpparam()
+        BPPARAM = bpparam()
     )
+    res
 }
 
 
-.checkArgs <- function(seObject,phenotype1, phenotype2, geneNetworks){
-    if(!methods::is(seObject, "SummarizedExperiment")){
-        # This will not be called with subclasses (i.e. RangedExperiment)
-        stop("First argument must be a SummarizedExperiment object or subclass")
-    }
-    p1Index <- .checkPhenotype(seObject, phenotype1)
-    p2Index <- .checkPhenotype(seObject, phenotype2)
-    seDims <- SummarizedExperiment::dims(seObject)
-    geneNetworks <- ensureNamed(geneNetworks)
-    geneNetworks <- lapply(geneNetworks, .checkNetwork, numRows = seDims[1],
-                           rownames(seObject))
-    list(p1Index=p1Index, p2Index=p2Index, geneNetworks=geneNetworks)
-}
-
-
-.checkPhenotype <- function(seObject, phenotype){
-    dimSeObject <- SummarizedExperiment::dim(seObject)
-    if(is.logical(phenotype)){
-        if(length(phenotype)!=dimSeObject[2]){
-            stop(paste("Logical Phenotype Vectors should be ",
-                       "the same length as the number of samples, but ",
-                       "phenotype has length: ", length(phenotype),
-                       " not ", dimSeObject[2]))
-        }
-        pIndex <- SummarizedExperiment::colnames(seObject)[phenotype]
-    } else {
-        pIndex <- phenotype
-    }
-    pIndex
-}
-
-.checkNetwork <- function(network, numRows, rowNames){
-    if(is.logical(network)){
-        if(length(phenotype)!=numRows){
-            stop(paste("Logical Gene Network Vectors should be ",
-                 "the same length as the number of genes, but ",
-                 "network has has length: ", length(network),
-                 " not ", numRows))
-        }
-        gIndex <- rowNames[network]
-    } else {
-        gIndex <- network
-    }
-    gIndex
-}
 
