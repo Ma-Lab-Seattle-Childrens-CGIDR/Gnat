@@ -50,13 +50,13 @@
 #' @include utils.R crane.R race.R dirac.R infer.R
 createClassifier <- function(expression, phenotype1, phenotype2, geneNetwork,
                              method=c("DIRAC","CRANE","RACE"),
-                             phenotype1Name="p1", phenotype2Name="p2",
+                             phenotypeNames=c("p1","p2"),
                              geneNetworkName="gn",
                              assayName="counts"){
     method <- match.args(method)
-    classifierFactoryList <- list(DIRAC=diracEntropyClassifier,
-                                  CRANE=craneEntropyClassifier,
-                                  RACE=raceEntropyClassifier)
+    classifierFactoryList <- list(DIRAC=.diracEntropyClassifier,
+                                  CRANE=.craneEntropyClassifier,
+                                  RACE=.raceEntropyClassifier)
     classifierFactory <- classifierFactoryList[[method]]
     if(is(expression, "SummarizedExperiment")){
         p1Index <- .checkPhenotype(seObject=expression, phenotype=phenotype1)
@@ -74,7 +74,7 @@ createClassifier <- function(expression, phenotype1, phenotype2, geneNetwork,
         return(.wrapSeClassifier(classifier = classifier,
                                  colDataNameDefault =
                                      paste(geneNetworkName,
-                                           phenotype1Name,
+                                           phenotypeNames[[1]],
                                            sep="_"),
                                  assayDefault = assayName))
 
@@ -110,7 +110,7 @@ createClassifier <- function(expression, phenotype1, phenotype2, geneNetwork,
 #' # example code
 #' @export
 #' @include dirac.R
-diracEntropyClassifier <- function(expression,
+.diracEntropyClassifier <- function(expression,
                                    phenotype1,
                                    phenotype2,
                                    geneIndex){
@@ -154,7 +154,7 @@ diracEntropyClassifier <- function(expression,
 #' # example code
 #' @export
 #' @include race.R
-raceEntropyClassifier <- function(expression,
+.raceEntropyClassifier <- function(expression,
                                   phenotype1,
                                   phenotype2,
                                   geneIndex){
@@ -197,7 +197,7 @@ raceEntropyClassifier <- function(expression,
 #' # example code
 #' @export
 #' @include crane.R
-craneEntropyClassifier <- function(expression,
+.craneEntropyClassifier <- function(expression,
                                    phenotype1,
                                    phenotype2,
                                    geneIndex){

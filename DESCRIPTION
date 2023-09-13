@@ -31,6 +31,7 @@ Collate:
     'Gnat-package.R'
     'utils.R'
     'bootstrap_score.R'
+    'bySample.R'
     'infer.R'
     'dirac.R'
     'race.R'

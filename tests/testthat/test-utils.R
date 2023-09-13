@@ -1,12 +1,13 @@
 testthat::test_that("Ensure named works", {
-    test_list.unnamed <- list(1, 2, 3, 4)
-    test_list.named <- ensureNamed(test_list.unnamed, prefix = "g_")
-    expect_length(test_list.named, length(test_list.unnamed))
-    expect_named(test_list.named, c("g_1", "g_2", "g_3", "g_4"))
-    test_list.named <- list(a = 1, b = 2, c = 3, d = 4)
-    test_list.ensured <- ensureNamed(test_list.named, prefix = "g_")
-    expect_length(test_list.ensured, length(test_list.named))
-    expect_named(test_list.ensured, names(test_list.named))
+    testListUnamed <- list(1, 2, 3, 4)
+    testListNamed <- ensureNamed(testListUnamed, prefix = "g_")
+    expect_length(testListNamed, length(testListUnamed))
+    expect_named(testListNamed, c("g_1", "g_2", "g_3", "g_4"))
+    testListNamed <- list(a = 1, b = 2, c = 3, d = 4)
+    testListEnsures <- ensureNamed(testListNamed, prefix = "g_")
+    expect_length(testListEnsures, length(testListNamed))
+    expect_named(testListEnsures, names(testListNamed))
+    expect_type(testListEnsures, "list")
 })
 
 test_that("Simple Rank Works",{
@@ -18,3 +19,5 @@ test_that("Simple Rank Works",{
     ranked <- simpleRank(orderedMat)
     expect_equal(ranked, orderedMat)
 })
+
+# ADD TESTS FOR ARGUMENT HANDLING FUNCTIONS
