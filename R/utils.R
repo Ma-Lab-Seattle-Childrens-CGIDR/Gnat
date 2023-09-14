@@ -43,6 +43,13 @@ simpleRank <- function(filteredExpression, margin=2){
 # Matrix Argument Handling ------------------------------------------------
 
 .convertPhenotype <- function(phenotype, expressionMatrix){
+    if(length(phenotype)==1){
+        warning("Phenotype is only length 1, which can cause issues with later",
+                " analyses")
+    }
+    if(length(phenotype)<1){
+        stop("Phenotype is empty")
+    }
     numCols <- dim(expressionMatrix)[2]
     if(is.logical(phenotype)){
         if(length(phenotype)==numCols){
@@ -62,44 +69,53 @@ simpleRank <- function(filteredExpression, margin=2){
     columnNames <- colnames(expressionMatrix)
     if(is.character(phenotype)){
         if(all(phenotype %in% columnNames)){
-            pIndex <- match(phenotype, colNames)
+            pIndex <- match(phenotype, columnNames)
             return(pIndex)
         } else {
             stop(paste("Couldn't find all phenotype entries in expression ",
                        "matrix. Missing: ",
-                       setdiff(phenotype, columnNames)))
+                       paste(setdiff(phenotype, columnNames), collapse=", "),
+                       sep=""))
         }
     }
     stop(paste("Couldn't Parse Phenotype, should be logical, character, ",
-               "or numeric vector"))
+               "or numeric vector", sep=""))
 }
 
 .convertNetwork <- function(geneNetwork, expressionMatrix){
+    if(length(geneNetwork)==1){
+        warning("Gene network is only length 1, which can cause issues with",
+                " later analyses")
+    }
+    if(length(geneNetwork)<1){
+        stop("Gene network is empty")
+    }
     numRows <- dim(expressionMatrix)[1]
     if(is.logical(geneNetwork)){
         if(length(geneNetwork)==numRows){
             gIndex <- seq(numRows)[geneNetwork]
             return(gIndex)
         } else {
-            stop(paste("If Gene Network is logical, must be same length as",
-                       " rows of expression matrix"))
+            stop(paste("If gene network is logical, must be same length as",
+                       " rows of expression matrix", sep=""))
         }
     }
     if(is.numeric(geneNetwork)){
         if(!(max(geneNetwork)<=numRows)){
-            stop("Gene Network index out of range")
+            stop("Gene network index out of range")
         }
         return(geneNetwork)
     }
-    rowNames <- colnames(expressionMatrix)
+    rowNames <- rownames(expressionMatrix)
     if(is.character(geneNetwork)){
         if(all(geneNetwork %in% rowNames)){
-            gIndex <- match(geneNetwork, colNames)
+            gIndex <- match(geneNetwork, rowNames)
             return(gIndex)
         } else {
             stop(paste("Couldn't find all gene network entries in expression ",
                        "matrix. Missing: ",
-                       setdiff(geneNetwork, rowNames)))
+                       paste(setdiff(geneNetwork, rowNames), collapse=", "),
+                       sep=""))
         }
     }
     stop(paste("Couldn't parse gene network, should be logical, character, ",
@@ -121,7 +137,7 @@ simpleRank <- function(filteredExpression, margin=2){
     }
     p1Index <- .checkPhenotype(seObject, phenotype1)
     p2Index <- .checkPhenotype(seObject, phenotype2)
-    seDims <- SummarizedExperiment::dims(seObject)
+    seDims <- dim(seObject)
     geneNetworks <- ensureNamed(geneNetworks)
     geneNetworks <- lapply(geneNetworks, .checkNetwork, numRows = seDims[1],
                            rownames(seObject))
@@ -130,34 +146,79 @@ simpleRank <- function(filteredExpression, margin=2){
 
 
 .checkPhenotype <- function(seObject, phenotype){
-    dimSeObject <- SummarizedExperiment::dim(seObject)
+    if(length(phenotype)==1){
+        warning("Phenotype is only length 1, which can cause issues with later",
+                " analyses")
+    }
+    if(length(phenotype)<1){
+        stop("Phenotype is empty")
+    }
+    dimSeObject <- dim(seObject)
     if(is.logical(phenotype)){
         if(length(phenotype)!=dimSeObject[2]){
             stop(paste("Logical Phenotype Vectors should be ",
                        "the same length as the number of samples, but ",
                        "phenotype has length: ", length(phenotype),
-                       " not ", dimSeObject[2]))
+                       " not ", dimSeObject[2], sep=""))
         }
-        pIndex <- SummarizedExperiment::colnames(seObject)[phenotype]
-    } else {
-        pIndex <- phenotype
+        pIndex <- seq(dimSeObject[2])[phenotype]
+        return(pIndex)
+    } else if(is.character(phenotype)){
+        columnNames <- SummarizedExperiment::colnames(seObject)
+        if(all(phenotype %in% columnNames)){
+            pIndex <- match(phenotype, columnNames)
+            return(pIndex)
+        } else {
+            stop(paste("Couldn't find all phenotype entries in seObject ",
+                       "colnames. Missing: ",
+                       paste(setdiff(phenotype, columnNames), collapse=", "),
+                       sep=""))
+        }
+    } else if(is.numeric(phenotype)){
+        if(!(max(phenotype)<=dimSeObject[2])){
+            stop("Phenotype index out of range")
+        }
+        return(phenotype)
     }
-    pIndex
+    stop(paste("Couldn't Parse Phenotype, should be logical, character, ",
+               "or numeric vector", sep=""))
 }
 
 .checkNetwork <- function(network, numRows, rowNames){
+    if(length(network)==1){
+        warning("Network is only length 1, which can cause issues with later",
+                " analyses")
+    }
+    if(length(network)<1){
+        stop("Network is empty")
+    }
     if(is.logical(network)){
-        if(length(phenotype)!=numRows){
+        if(length(network)!=numRows){
             stop(paste("Logical Gene Network Vectors should be ",
                        "the same length as the number of genes, but ",
-                       "network has has length: ", length(network),
-                       " not ", numRows))
+                       "network has has length ", length(network),
+                       " not ", numRows, sep=""))
         }
-        gIndex <- rowNames[network]
-    } else {
-        gIndex <- network
+        gIndex <- seq(numRows)[network]
+        return(gIndex)
+    } else if(is.character(network)){
+        if(all(network %in% rowNames)){
+            gIndex <- match(network, rowNames)
+            return(gIndex)
+        } else {
+            stop(paste("Couldn't find all gene network entries in seObject ",
+                       "rownames. Missing: ",
+                       paste(setdiff(network, rowNames), collapse=", "),
+                       sep=""))
+        }
+    } else if(is.numeric(network)){
+        if(!(max(network)<=numRows)){
+            stop("Gene network index out of range")
+        }
+        return(network)
     }
-    gIndex
+    stop(paste("Couldn't Parse gene network, should be logical, character, ",
+               "or numeric vector", sep=""))
 }
 
 

@@ -170,16 +170,16 @@ seRace <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 seInfer <- function(seObject, phenotype1, phenotype2, geneNetworkList,
                     assayName = "counts", bootstrapIterations=1000,
                     replace=TRUE, asFrame=TRUE, BPPARAM=bpparam()){
-    .wrapMethodComparePhenotypes(method=craneComparePhenotypes,
-                seObject = seObject,
-                phenotype1 = phenotype1,
-                phenotype2 = phenotype2,
-                geneNetworkList = geneNetworkList,
-                assayName = assayName,
-                bootstrapIterations = bootstrapIterations,
-                replace = replace,
-                asFrame = asFrame,
-                BPPARAM=BPPARAM)
+    .wrapMethodComparePhenotypes(method=inferComparePhenotypes,
+                                 seObject = seObject,
+                                 phenotype1 = phenotype1,
+                                 phenotype2 = phenotype2,
+                                 geneNetworkList = geneNetworkList,
+                                 assayName = assayName,
+                                 bootstrapIterations = bootstrapIterations,
+                                 replace = replace,
+                                 asFrame = asFrame,
+                                 BPPARAM=BPPARAM)
 }
 
 
@@ -207,15 +207,14 @@ seInfer <- function(seObject, phenotype1, phenotype2, geneNetworkList,
 #' @export
 #'
 #' @examples
-seDiracBySample <- function(seObject, phenotype1, phenotype2,
-                            phenotypeNames=c("phenotype1", "phenotype2"),
-                            geneNetwork, geneNetworkName="gn",
+seDiracBySample <- function(seObject, phenotype,
+                            geneNetwork,
+                            colName="diracSampleEntropy",
                             assayName="counts"){
     .wrapMethodBySample(seObject = seObject, method=diracSampleScore,
-                        methodName = "DIRAC", phenotype1=phenotype1,
-                        phenotype2=phenotype2, phenotypeNames = phenotypeNames,
+                        methodName = "DIRAC", phenotype=phenotype,
                         geneNetwork=geneNetwork,
-                        geneNetworkName=geneNetworkName, assayName=assayName)
+                        colName=colName, assayName=assayName)
 }
 
 #' Compute the Sample Wise entropy using RACE for a SummarizedExperiment
@@ -239,15 +238,14 @@ seDiracBySample <- function(seObject, phenotype1, phenotype2,
 #' @export
 #'
 #' @examples
-seRaceBySample <- function(seObject, phenotype1, phenotype2,
-                            phenotypeNames=c("phenotype1", "phenotype2"),
-                            geneNetwork, geneNetworkName="gn",
-                            assayName="counts"){
+seRaceBySample <- function(seObject, phenotype,
+                           geneNetwork,
+                           colName="raceSampleEntropy",
+                           assayName="counts"){
     .wrapMethodBySample(seObject = seObject, method=raceSampleScore,
-                        methodName = "RACE", phenotype1=phenotype1,
-                        phenotype2=phenotype2, phenotypeNames = phenotypeNames,
+                        methodName = "RACE", phenotype=phenotype,
                         geneNetwork=geneNetwork,
-                        geneNetworkName=geneNetworkName, assayName=assayName)
+                        colName=colName, assayName=assayName)
 }
 
 #' Compute the Sample Wise entropy using CRANE for a SummarizedExperiment
@@ -271,25 +269,21 @@ seRaceBySample <- function(seObject, phenotype1, phenotype2,
 #' @export
 #'
 #' @examples
-seCraneBySample <- function(seObject, phenotype1, phenotype2,
-                           phenotypeNames=c("phenotype1", "phenotype2"),
-                           geneNetwork, geneNetworkName="gn",
-                           assayName="counts"){
+seCraneBySample <- function(seObject, phenotype,
+                            geneNetwork,
+                            colName="craneSampleEntropy",
+                            assayName="counts"){
     .wrapMethodBySample(seObject = seObject, method=craneSampleScore,
-                        methodName = "CRANE", phenotype1=phenotype1,
-                        phenotype2=phenotype2, phenotypeNames = phenotypeNames,
+                        methodName = "CRANE", phenotype=phenotype,
                         geneNetwork=geneNetwork,
-                        geneNetworkName=geneNetworkName, assayName=assayName)
+                        colName=colName, assayName=assayName)
 }
-
-
-
-
 # Helper Functions --------------------------------------------------------
 
-.wrapMethodBySample <- function(seObject, method, methodName, phenotype1,
-                                phenotype2, phenotypeNames, geneNetwork,
-                                geneNetworkName, assayName="counts"){
+.wrapMethodBySample <- function(seObject, method, methodName, phenotype,
+                                geneNetwork,
+                                colName=paste(methodName,"sampleEntropy"),
+                                assayName="counts"){
     # Ensure that seObject is a SummarizedExperiment object
     if(!methods::is(seObject, "SummarizedExperiment")){
         stop("First argument must be a SummarizedExperiment object or subclass")
@@ -298,31 +292,22 @@ seCraneBySample <- function(seObject, phenotype1, phenotype2,
     # to the modified value
     columnData <- SummarizedExperiment::colData(seObject)
     # Get dims of the seObject
-    dims <- SummarizedExperiment::dim(seObject)
-    p1Index <- .checkPhenotype(seObject=seObject, phenotype=phenotype1)
-    p2Index <- .checkPhenotype(seObject=seObject, phenotype=phenotype2)
+    dims <- dim(seObject)
+    pIndex <- .checkPhenotype(seObject=seObject, phenotype=phenotype)
     geneIndex <- .checkNetwork(network = geneNetwork,
                                numRows = dims[[1]],
                                rowNames =
                                    SummarizedExperiment::rownames(seObject))
-    # Create names for the additional columns being added to the colData
-    p1ColName <- paste(methodName, geneNetworkName, phenotypeNames[1],
-                       "entropy", sep="_")
-    p2ColName <- paste(methodName, geneNetworkName, phenotypeNames[2],
-                       "entropy", sep="_")
-    # Get expression values for the two phenotypes
-    p1FilteredExpression <- assays(seObject)[[assayName]][geneIndex, p1Index]
-    p2FilteredExpression <- assays(seObject)[[assayName]][geneIndex, p2Index]
+    # Get expression values for the phenotype
+    filteredExpression <-
+        SummarizedExperiment::assays(seObject)[[assayName]][geneIndex, pIndex]
     # Get entropy values
-    p1Entropy <- method(p1FilteredExpression)
-    p2Entropy <- method(p2FilteredExpression)
+    sampleEntropy <- method(filteredExpression)
     # Update the coldata to include the columns for entropy
-    columnData[p1ColName] <- NA
-    columnData[p1Index, p1ColName] <- p1Entropy
-    columnData[p2ColName] <- NA
-    columnData[p2Index, p2ColName] <- p2Entropy
+    columnData[colName] <- NA
+    columnData[pIndex, colName] <- sampleEntropy
     # Update the SummarizedExperiment object with
-    colData(seObject) <- columnData
+    SummarizedExperiment::colData(seObject) <- columnData
     seObject
 }
 
@@ -344,8 +329,9 @@ seCraneBySample <- function(seObject, phenotype1, phenotype2,
     p2Index <- args$p2Index
     geneNetworks <- args$geneNetworks
     # Ensure that assay argument is an assay in the seObject
-    if(!(assayName %in% names(assays(seObject)))){
-        stop(paste("Assay ", assayName, " not found in Summarized Experiment"))
+    if(!(assayName %in% names(SummarizedExperiment::assays(seObject)))){
+        stop(paste("Assay ", assayName, " not found in Summarized Experiment",
+                   sep=""))
     }
     # Use method to calculate result
     res <- method(
@@ -356,7 +342,7 @@ seCraneBySample <- function(seObject, phenotype1, phenotype2,
         bootstrapIterations = bootstrapIterations,
         replace = replace,
         asFrame = asFrame,
-        BPPARAM = bpparam()
+        BPPARAM = BPPARAM
     )
     res
 }

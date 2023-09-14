@@ -5,12 +5,17 @@
 #' Compare Phenotypes using Rank Entropy Methods
 #'
 #' Compare the rank entropy between two phenotypes for a given gene network,
-#' using either DIRAC, CRANE, RACE, or INFER
+#' using either DIRAC, CRANE, RACE, or INFER. The expression data can be an
+#' array type object which implements [], if a logical vector input is
+#' desired it will also need to implement length and dim, and if a character
+#' vector input is desired it will also have to implement rownames, and colnames
+#' functions. Index vectors (for phenotypes and gene networks) can be
+#' numeric (representing the numeric index of the gene/sample), character
+#' (representing the row or column name), or logical (TRUE for samples/genes
+#' in the phenotype/network, and FALSE otherwise).
 #'
 #' @param expression Gene expression data, can be either a SummarizedExperiment
-#'      object, or an array type object which implements [], and also
-#'      rownames/colnames if phenotypes or geneNetworks use character vector
-#'      indices
+#'      object, or an array type object, see details for more information
 #' @param method Method to use to calculate the rank entropy, can be DIRAC,
 #'      RACE, CRANE, or INFER
 #' @param phenotype1,phenotype2 Index vectors for the locations within
@@ -54,29 +59,30 @@ compareRankEntropy <- function(expression,
         DIRAC=diracComparePhenotypes,
         CRANE=craneComparePhenotypes,
         INFER=inferComparePhenotypes,
-        RACE=raceComparePhenotypes,
+        RACE=raceComparePhenotypes
     )
     method <- match.arg(method)
     methodFunction <- methodFunctionList[[method]]
     if(methods::is(expression, "SummarizedExperiment")){
         return(
             .wrapMethodComparePhenotypes(method=methodFunction,
-                                            seObject = expression,
-                                            phenotype1 = phenotype1,
-                                            phenotype2 = phenotype2,
-                                            geneNetworkList = geneNetworkList,
-                                            assayName = assayName,
-                                            bootstrapIterations =
-                                             bootstrapIterations,
-                                            replace = replace,
-                                            asFrame = asFrame))
+                                         seObject = expression,
+                                         phenotype1 = phenotype1,
+                                         phenotype2 = phenotype2,
+                                         geneNetworkList = geneNetworkList,
+                                         assayName = assayName,
+                                         bootstrapIterations =
+                                         bootstrapIterations,
+                                         replace = replace,
+                                         asFrame = asFrame,
+                                         BPPARAM=BPPARAM))
     }
     p1Index <- .convertPhenotype(phenotype = phenotype1,
                                  expressionMatrix = expression)
     p2Index <- .convertPhenotype(phenotype = phenotype2,
                                  expressionMatrix = expression)
     geneNetworkList <- .convertNetworkList(geneNetworkList=geneNetworkList,
-                                           expressionMatrix=expressionMatrix)
+                                           expressionMatrix=expression)
     methodFunction(expression=expression,
                    geneNetworkList=geneNetworkList,
                    phenotype1=p1Index,

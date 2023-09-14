@@ -9,7 +9,7 @@ test_that("Classifier Works",{
     expression <- matrix(floor(runif(10 * 8, min = 1, max = 500000)),
                          ncol = 8, nrow = 10)
     geneIndex <- c(1, 4, 5, 7)
-    classificationFunction <- diracClassifier(expression,
+    classificationFunction <- .diracEntropyClassifier(expression,
                                               phenotype1 = c(1,2,3,4),
                                               phenotype2 = c(5,6,7,8),
                                               geneIndex = geneIndex)
